@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('id_anggota')
                   ->constrained('anggota')
-                  ->onDelete('cascade');
+                  ->restrictOnDelete();
             $table->string('kode_transaksi')->unique();
             $table->decimal('jumlah', 15, 2); 
             $table->string('sumber'); 

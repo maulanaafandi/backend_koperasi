@@ -42,6 +42,35 @@ return [
         ],
     ],
 
+    'guards' => [
+        'admin' => [
+            'driver' => 'session', 
+            'provider' => 'admin',
+        ],
+        'pengurus' => [
+            'driver' => 'session',
+            'provider' => 'pengurus_provider',
+        ],
+        'anggota' => [
+            'driver' => 'session',
+            'provider' => 'anggota_provider',
+        ],
+    ],
+
+    'providers' => [
+        'admin' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Admin::class,
+        ],
+        'pengurus_provider' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Pengurus::class,
+        ],
+        'anggota_provider' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Anggota::class,
+        ],
+    ],
     /*
     |--------------------------------------------------------------------------
     | User Providers

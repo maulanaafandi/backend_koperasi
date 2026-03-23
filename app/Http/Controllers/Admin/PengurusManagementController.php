@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class PengurusManagementController extends Controller
 {
-    // 1. Tampilkan Daftar Pengurus 
+
     public function index()
     {
         $pengurus = Pengurus::select('id', 'nomor_pengurus', 'nama_lengkap', 'status_akun')->get();
@@ -18,7 +18,6 @@ class PengurusManagementController extends Controller
         ]);
     }
 
-    // 2. Tampilkan Detail Pengurus
     public function show($id)
     {
         $pengurus = Pengurus::select('id', 'nomor_pengurus', 'nama_lengkap', 'nomor_handphone', 'status_akun')
@@ -34,7 +33,6 @@ class PengurusManagementController extends Controller
         ]);
     }
 
-    // 3. Aktivasi atau Menonaktifkan
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
@@ -51,7 +49,6 @@ class PengurusManagementController extends Controller
         ]);
     }
 
-    // 4. Hapus Pengurus 
     public function destroy($id)
     {
         $pengurus = Pengurus::findOrFail($id);

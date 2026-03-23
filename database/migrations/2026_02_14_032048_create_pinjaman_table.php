@@ -15,13 +15,13 @@ return new class extends Migration
             $table->id();
             $table->foreignId('id_anggota')
                   ->constrained('anggota')
-                  ->onDelete('cascade');
+                  ->restrictOnDelete();
             $table->foreignId('id_transaksi')
                   ->constrained('transaksi')
-                  ->onDelete('cascade');
+                  ->restrictOnDelete();
             $table->foreignId('id_tenor')
                   ->constrained('tenor')
-                  ->onDelete('cascade');
+                  ->restrictOnDelete();
             $table->decimal('jumlah_pinjaman', 15, 2);
             $table->decimal('sisa_pinjaman', 15, 2);
              $table->enum('status', [

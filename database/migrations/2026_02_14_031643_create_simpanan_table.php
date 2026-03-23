@@ -15,13 +15,13 @@ return new class extends Migration
             $table->id();
             $table->foreignId('id_anggota')
                   ->constrained('anggota')
-                  ->onDelete('cascade');
+                  ->restrictOnDelete();
             $table->foreignId('id_jenis_simpanan')
                   ->constrained('jenis_simpanan')
-                  ->onDelete('cascade');
+                  ->restrictOnDelete();
             $table->foreignId('id_transaksi')
                   ->constrained('transaksi')
-                  ->onDelete('cascade');
+                  ->restrictOnDelete();
             $table->decimal('jumlah_simpanan', 15, 2);
             $table->timestamps();
         });

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
              $table->foreignId('id_pinjaman')
                   ->constrained('pinjaman')
-                  ->onDelete('cascade');
+                  ->restrictOnDelete();
             $table->decimal('wajib_bayar', 15, 2);
             $table->timestamps();
         });

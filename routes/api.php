@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\PengurusManagementController;
+use App\Http\Controllers\Admin\JenisSimpananController;
 use App\Http\Controllers\Pengurus\AnggotaManagementController;
 
 Route::get('/user', function (Request $request) {
@@ -30,5 +31,11 @@ Route::middleware(['auth:sanctum', 'is_admin'])->group(function () {
     Route::get('/admin/detail-akun-pengurus/{id}', [PengurusManagementController::class, 'show']);
     Route::put('/admin/update-status-pengurus/{id}', [PengurusManagementController::class, 'updateStatus']);
     Route::delete('/admin/hapus-pengurus/{id}', [PengurusManagementController::class, 'destroy']);
+
+    Route::get('/admin/jenis-simpanan', [JenisSimpananController::class, 'index']);
+    Route::post('/admin/jenis-simpanan', [JenisSimpananController::class, 'store']);
+    Route::get('/admin/jenis-simpanan/{id}', [JenisSimpananController::class, 'show']);
+    Route::put('/admin/jenis-simpanan/{id}', [JenisSimpananController::class, 'update']);
+    Route::delete('/admin/jenis-simpanan/{id}', [JenisSimpananController::class, 'destroy']);
 
 });

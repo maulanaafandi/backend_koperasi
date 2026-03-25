@@ -13,14 +13,16 @@ return new class extends Migration
     {
         Schema::create('pengurus', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_lengkap');
-            $table->enum('jenis_kelamin', ['L', 'P']);
+            $table->string('nama_lengkap')->nullable();
+            $table->string('foto_profil')->nullable();
+            $table->enum('jenis_kelamin', ['L', 'P'])->nullable();
             $table->string('nomor_pengurus')->unique();
-            $table->string('nomor_handphone')->unique();
-            $table->string('password');
+            $table->string('nomor_handphone')->unique()->nullable();
+            $table->string('password')->nullable();
             $table->enum('status_akun', ['Aktif', 'Non-Aktif', 'Proses'])
                   ->default('Proses');
-            $table->timestamps();
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->nullable()->useCurrentOnUpdate();
         });
     }
 

@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('tenor', function (Blueprint $table) {
             $table->id();
-            $table->string('tenor');
+            $table->integer('tenor');
+            $table->decimal('persen', 5,2);
         });
     }
 

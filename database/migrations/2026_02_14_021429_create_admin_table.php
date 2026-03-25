@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('nomor_admin')->unique();
             $table->string('password');
-            $table->timestamps();
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->nullable()->useCurrentOnUpdate();
         });
     }
 

@@ -11,9 +11,17 @@ class Pengurus extends Authenticatable
     use HasApiTokens;
 
     protected $table = 'pengurus';
+
+    public $timestamps = false;
+    
     protected $fillable = [
-        'nama_lengkap', 'jenis_kelamin', 'nomor_pengurus', 
-        'nomor_handphone', 'password', 'status_akun'
+        'nama_lengkap', 
+        'foto_profil',
+        'jenis_kelamin', 
+        'nomor_pengurus', 
+        'nomor_handphone',
+        'password',
+        'status_akun'
     ];
     protected $hidden = ['password'];
 }

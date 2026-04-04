@@ -12,9 +12,16 @@ class Anggota extends Authenticatable
 
     protected $table = 'anggota';
     protected $fillable = [
-        'nama_lengkap', 'foto_profil', 'jenis_kelamin', 'alamat', 
-        'pin', 'nomor_anggota', 'nomor_handphone', 'email', 
-        'password', 'status_akun'
+        'nama_lengkap', 
+        'foto_profil', 
+        'jenis_kelamin', 
+        'alamat', 
+        'pin', 
+        'nomor_anggota', 
+        'nomor_handphone', 
+        'email', 
+        'password', 
+        'status_akun'
     ];
     protected $hidden = ['password'];
 }

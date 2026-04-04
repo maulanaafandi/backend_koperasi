@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class JenisSimpanan extends Model
 {
     protected $table = 'jenis_simpanan';
-    protected $fillable = ['jenis_simpanan'];
+    protected $fillable = [
+        'jenis_simpanan'
+        ];
     public $timestamps = false; 
 
     public function simpanan()

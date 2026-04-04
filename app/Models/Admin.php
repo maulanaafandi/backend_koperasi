@@ -12,6 +12,9 @@ class Admin extends Authenticatable
 
     public $timestamps = false;
     protected $table = 'admin'; 
-    protected $fillable = ['nomor_admin', 'password'];
+    protected $fillable = [
+    'nomor_admin',
+    'password'
+    ];
     protected $hidden = ['password'];
 }

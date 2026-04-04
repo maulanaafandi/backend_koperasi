@@ -10,7 +10,8 @@ class Tenor extends Model
     protected $table = 'tenor';
     protected $fillable = [
         'tenor',
-        'persen'
+        'tipe',
+        'bunga'
         ];
     public $timestamps = false;
     /**

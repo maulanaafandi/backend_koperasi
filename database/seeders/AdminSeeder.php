@@ -11,10 +11,11 @@ class AdminSeeder extends Seeder
 {
     public function run(): void
     {
+        $passwordEnv = env('PASSWORD_ADMIN', 'password');
         Admin::updateOrCreate(
             ['nomor_admin' => 'ADM-001'], 
             [
-                'password' => Hash::make('password123'), 
+                'password' => Hash::make($passwordEnv), 
             ]
         );
 

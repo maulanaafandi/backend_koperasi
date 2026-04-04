@@ -13,7 +13,6 @@ class JenisSimpananController extends Controller
     {
         $data = JenisSimpanan::all();
         return response()->json([
-            'message' => 'Daftar jenis simpanan berhasil dimuat',
             'data' => $data
         ]);
     }
@@ -34,7 +33,6 @@ class JenisSimpananController extends Controller
 
         return response()->json([
             'message' => 'Jenis simpanan berhasil ditambahkan',
-            'data' => $jenis
         ], 201);
     }
 
@@ -62,8 +60,8 @@ class JenisSimpananController extends Controller
         $jenis->update(['jenis_simpanan' => $request->jenis_simpanan]);
 
         return response()->json([
-            'message' => 'Jenis simpanan berhasil diperbarui',
-            'data' => $jenis
+            'message' => 'Jenis simpanan berhasil diupdate',
+
         ]);
     }
 

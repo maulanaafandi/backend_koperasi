@@ -18,7 +18,6 @@ class PengurusManagementController extends Controller
                             ->get();
 
         return response()->json([
-            'success' => true,
             'data'    => $pengurus
         ], 200);
     }
@@ -35,16 +34,6 @@ class PengurusManagementController extends Controller
 
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'nama_lengkap'    => 'required|string|max:255',
-            'jenis_kelamin'   => 'required|in:L,P',
-            'nomor_handphone' => 'required|string|unique:pengurus,nomor_handphone',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
-
         $tahun = date('Y');
         $lastPengurus = Pengurus::whereYear('created_at', $tahun)->latest()->first();
         
@@ -63,16 +52,12 @@ class PengurusManagementController extends Controller
             'nomor_pengurus'  => $nomorPengurusOtomatis,
             'jenis_kelamin'   => $request->jenis_kelamin,
             'nomor_handphone' => $request->nomor_handphone,
-            'password'        => Hash::make($request->password),
+//            'password'        => Hash::make($request->password),
             'status_akun'     => 'Proses', 
         ]);
 
         return response()->json([
-            'message' => 'Akun Pengurus berhasil dibuat',
-            'data'    => [
-                'nomor_pengurus' => $pengurus->nomor_pengurus,
-                'status_akun'    => $pengurus->status_akun,
-            ]
+            'message' => "Nomor Pengurus dengan nomor {$nomorPengurusOtomatis} berhasil dibuat",
         ], 201);
     }
 

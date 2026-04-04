@@ -9,58 +9,98 @@ use Illuminate\Support\Facades\Validator;
 
 class LamaAngsuranController extends Controller
 {
+
     public function index()
     {
-        $data = Tenor::select('id', 'tenor', 'persen')->get();
-        return response()->json(['success' => true, 'data' => $data], 200);
+        $data = Tenor::all();
+        return response()->json([
+            'success' => true,
+            'data'    => $data
+        ], 200);
     }
 
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'tenor'  => 'required|integer|unique:tenor,tenor',
-            'persen' => 'required|numeric|min:0',
+            'tenor' => 'required|integer|min:1|max:24',
+            'tipe'  => 'required|in:Anggota,Non-Anggota',
+        ], [
+            'tenor.min' => 'Lama angsuran minimal adalah 1 bulan.',
+            'tenor.max' => 'Lama angsuran maksimal adalah 24 bulan.',
+            'tipe.in'   => 'Pilihan hanya Anggota atau Non-Anggota.',
         ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
 
-        $tenor = Tenor::create($request->only('tenor', 'persen'));
+        $isExist = Tenor::where('tenor', $request->tenor)
+                    ->where('tipe', $request->tipe)
+                    ->exists();
+
+        if ($isExist) {
+            return response()->json([
+                'message' => "Data lama angsuran {$request->tenor} bulan untuk {$request->tipe} sudah ada."
+            ], 422);
+        }
+
+        // LOGIKA OTOMATIS: Anggota 1%, Non-Anggota 2%
+        $bunga = ($request->tipe === 'Anggota') ? 1.00 : 2.00;
+
+        $tenor = Tenor::create([
+            'tenor' => $request->tenor,
+            'tipe'  => $request->tipe,
+            'bunga' => $bunga,
+        ]);
 
         return response()->json([
-            'message' => 'Data tenor berhasil ditambahkan',
-            'data'    => $tenor
+            'message' => 'Data lama angsuran berhasil ditambahkan',
         ], 201);
     }
 
     public function show($id)
     {
         $tenor = Tenor::find($id);
-        if (!$tenor) return response()->json(['message' => 'Data tidak ditemukan'], 404);
+
+        if (!$tenor) {
+            return response()->json(['message' => 'Data tidak ditemukan'], 404);
+        }
         
-        return response()->json(['success' => true, 'data' => $tenor], 200);
+        return response()->json([ 
+            'data'    => $tenor
+        ], 200);
     }
 
     public function update(Request $request, $id)
     {
         $tenor = Tenor::find($id);
-        if (!$tenor) return response()->json(['message' => 'Nomor tidak ditemukan'], 404);
+
+        if (!$tenor) {
+            return response()->json(['message' => 'Data tidak ditemukan'], 404);
+        }
 
         $validator = Validator::make($request->all(), [
-            'tenor'  => 'required|integer|unique:tenor,tenor,' . $id,
-            'persen' => 'required|numeric|min:0',
+            'tenor' => 'required|integer|min:1|max:24',
+            'tipe'  => 'required|in:Anggota,Non-Anggota',
+        ], [
+            'tenor.min' => 'Lama angsuran minimal adalah 1 bulan.',
+            'tenor.max' => 'Lama angsuran maksimal adalah 24 bulan.',
         ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
 
-        $tenor->update($request->only('tenor', 'persen'));
+        $bunga = ($request->tipe === 'Anggota') ? 1.00 : 2.00;
+
+        $tenor->update([
+            'tenor' => $request->tenor,
+            'tipe'  => $request->tipe,
+            'bunga' => $bunga,
+        ]);
 
         return response()->json([
-            'message' => 'Data tenor berhasil diperbarui',
-            'data'    => $tenor
+            'message' => 'Data lama angsuran berhasil diperbarui',
         ], 200);
     }
 }

@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('tenor', function (Blueprint $table) {
             $table->id();
             $table->integer('tenor');
-            $table->decimal('persen', 5,2);
+            $table->enum('tipe', ['Anggota', 'Non-Anggota'])->nullable();
+            $table->decimal('bunga', 5,2);
         });
     }
 

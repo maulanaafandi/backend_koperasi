@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'is_pengurus' => \App\Http\Middleware\CheckIsPengurus::class,
             'is_admin' => \App\Http\Middleware\CheckIsAdmin::class,
+            'is_anggota' => \App\Http\Middleware\CheckIsAnggota::class,
         ]);
     })
     ->withMiddleware(function (Middleware $middleware): void {

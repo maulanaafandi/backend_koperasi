@@ -16,6 +16,10 @@ return new class extends Migration
             $table->integer('tenor');
             $table->enum('tipe', ['Anggota', 'Non-Anggota'])->nullable();
             $table->decimal('bunga', 5,2);
+            $table->timestamp('created_at')->useCurrent();
+            $table->string('created_by')->useCurrent();
+            $table->timestamp('updated_at')->nullable()->useCurrentOnUpdate();
+            $table->string('updated_by')->nullable()->useCurrentOnUpdate();
         });
     }
 

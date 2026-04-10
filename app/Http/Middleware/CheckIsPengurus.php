@@ -13,7 +13,7 @@ class CheckIsPengurus
     {
         if (! $request->user() instanceof Pengurus) {
             return response()->json([
-                'message' => 'Akses ditolak. Fitur ini hanya untuk Pengurus.'
+                'message' => 'Acces denied. Fitur ini hanya untuk Pengurus.'
             ], 403);
         }
         return $next($request);

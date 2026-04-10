@@ -14,7 +14,7 @@ class CheckIsAdmin
     {
          if (! $request->user() instanceof Admin) {
             return response()->json([
-                'message' => 'Akses ditolak. Fitur ini hanya untuk Admin.'
+                'message' => 'Acces denied. Fitur ini hanya untuk Admin.'
             ], 403);
         }
         return $next($request);

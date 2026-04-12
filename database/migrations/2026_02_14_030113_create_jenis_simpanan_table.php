@@ -14,6 +14,10 @@ return new class extends Migration
         Schema::create('jenis_simpanan', function (Blueprint $table) {
             $table->id();
             $table->string('jenis_simpanan');
+            $table->decimal('saldo_minimum', 15, 2);
+            $table->timestamp('created_at')->useCurrent();
+            $table->string('updated_by')->nullable();
+            $table->timestamp('updated_at')->nullable();
         });
     }
 

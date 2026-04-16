@@ -135,23 +135,19 @@ public function loginPengurus(Request $request) {
 
 public function daftarUlangPengurus(Request $request)
 {
-$pengurus = Pengurus::where('nomor_pengurus', $request->nomor_pengurus)->first();
-    
+    $pengurus = Pengurus::where('nomor_pengurus', $request->nomor_pengurus)->first();
     $idPengurus = $pengurus ? $pengurus->id : null;
 
     $validator = Validator::make($request->all(), [
-        'nomor_pengurus'        => 'required|exists:pengurus,nomor_pengurus',
-        'nama_lengkap'          => 'required|string|max:255',
-        'jenis_kelamin'         => 'required|in:L,P',
+        'nomor_pengurus'  => 'required|exists:pengurus,nomor_pengurus',
+        'nama_lengkap'    => 'required|string|max:255',
+        'jenis_kelamin'   => 'required|in:L,P',
         'nomor_handphone' => 'required|string|max:12|unique:pengurus,nomor_handphone,' . $idPengurus,
-        'foto_profil'           => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-        'password'              => [
+        'foto_profil'     => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        'password'        => [
             'required',
-            'confirmed',       
-            Password::min(6)
-                ->letters()
-                ->numbers()
-                ->mixedCase()
+            'confirmed',
+            \Illuminate\Validation\Rules\Password::min(6)->letters()->numbers()->mixedCase()
         ],
     ], [
         'nomor_pengurus.exists'  => 'Nomor pengurus tidak terdaftar.',
@@ -165,25 +161,27 @@ $pengurus = Pengurus::where('nomor_pengurus', $request->nomor_pengurus)->first()
         return response()->json($validator->errors(), 422);
     }
 
-    $pengurus = Pengurus::where('nomor_pengurus', $request->nomor_pengurus)->first();
-
     if ($pengurus->status_akun === 'Aktif') {
         return response()->json(['message' => 'Akun ini sudah aktif, silakan login.'], 403);
     }
 
-    $pathFoto = $pengurus->foto_profil;
     if ($request->hasFile('foto_profil')) {
-        $pathFoto = $request->file('foto_profil')->store('foto_pengurus', 'public');
+        $pengurus->foto_profil = $request->file('foto_profil')->store('foto_pengurus', 'public');
     }
 
-    $pengurus->update([
-        'nama_lengkap'    => $request->nama_lengkap,
-        'foto_profil'     => $pathFoto,
-        'jenis_kelamin'   => $request->jenis_kelamin,
-        'nomor_handphone' => $request->nomor_handphone,
-        'password'        => Hash::make($request->password), 
-        'status_akun'     => 'Aktif',
-    ]);
+    $pengurus->nama_lengkap    = $request->nama_lengkap;
+    $pengurus->jenis_kelamin   = $request->jenis_kelamin;
+    $pengurus->nomor_handphone = $request->nomor_handphone;
+    $pengurus->password        = Hash::make($request->password);
+    
+    $pengurus->status_akun      = 'Aktif';
+    $pengurus->waktu_diaktifkan = now();
+    $pengurus->diaktifkan_oleh  = 'Sistem';
+    
+    $pengurus->waktu_dinonaktifkan = null;
+    $pengurus->dinonaktifkan_oleh  = null;
+
+    $pengurus->save();
 
     return response()->json([
         'message' => 'Daftar ulang berhasil. Akun Anda kini aktif.',

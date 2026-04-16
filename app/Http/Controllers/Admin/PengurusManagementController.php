@@ -8,17 +8,18 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash; 
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Carbon\Carbon;
 
 class PengurusManagementController extends Controller
 {
-    public function index()
+public function index()
     {
         $pengurus = Pengurus::select('id', 'foto_profil', 'nama_lengkap', 'nomor_pengurus')
-                            ->orderBy('created_at', 'desc')
+                            ->orderBy('waktu_dibuat', 'desc') 
                             ->get();
 
         return response()->json([
-            'data'    => $pengurus
+            'data' => $pengurus
         ], 200);
     }
 
@@ -27,15 +28,14 @@ class PengurusManagementController extends Controller
         $pengurus = Pengurus::findOrFail($id);
 
         return response()->json([
-            'success' => true,
             'data'    => $pengurus
         ], 200);
     }
 
-    public function store(Request $request)
+public function store(Request $request)
     {
         $tahun = date('Y');
-        $lastPengurus = Pengurus::whereYear('created_at', $tahun)->latest()->first();
+        $lastPengurus = Pengurus::whereYear('waktu_dibuat', $tahun)->latest('id')->first();
         
         if (!$lastPengurus) {
             $nomorUrut = '0001';
@@ -46,77 +46,52 @@ class PengurusManagementController extends Controller
         
         $nomorPengurusOtomatis = "PGR-" . $tahun . $nomorUrut;
 
-        $pengurus = Pengurus::create([
-            'nama_lengkap'    => $request->nama_lengkap,
-            'foto_profil'     => $request->foto_profil ?? null,
-            'nomor_pengurus'  => $nomorPengurusOtomatis,
-            'jenis_kelamin'   => $request->jenis_kelamin,
-            'nomor_handphone' => $request->nomor_handphone,
-//            'password'        => Hash::make($request->password),
-            'status_akun'     => 'Proses', 
-        ]);
+        $pengurus = new Pengurus();
+        $pengurus->nomor_pengurus = $nomorPengurusOtomatis;
+        $pengurus->status_akun    = 'Proses';
+        $pengurus->save();
 
         return response()->json([
-            'message' => "Nomor Pengurus dengan nomor {$nomorPengurusOtomatis} berhasil dibuat",
+            'message' => "Nomor Pengurus {$nomorPengurusOtomatis} berhasil dibuat.",
         ], 201);
     }
 
-    public function updateStatus(Request $request, $id)
-{
-    $request->validate([
-        'status_akun' => ['required', Rule::in(['Aktif', 'Non-Aktif', 'Proses'])
-    ],
-    ]);
-    $pengurus = Pengurus::find($id);
-    if (!$pengurus) {
+public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status_akun' => ['required', Rule::in(['Aktif', 'Non-Aktif', 'Proses'])],
+        ]);
+
+        $pengurus = Pengurus::findOrFail($id);
+        $adminLogin = auth()->user()->nomor_admin ?? 'Admin';
+
+        if ($request->status_akun === 'Aktif') {
+            $pengurus->status_akun      = 'Aktif';
+            $pengurus->waktu_diaktifkan = Carbon::now();
+            $pengurus->diaktifkan_oleh  = $adminLogin;
+            
+            $pengurus->waktu_dinonaktifkan = null;
+            $pengurus->dinonaktifkan_oleh  = null;
+
+        } elseif ($request->status_akun === 'Non-Aktif') {
+            $pengurus->status_akun         = 'Non-Aktif';
+            $pengurus->waktu_dinonaktifkan = Carbon::now();
+            $pengurus->dinonaktifkan_oleh  = $adminLogin;
+
+        } else {
+            $pengurus->status_akun         = 'Proses';
+            $pengurus->waktu_diaktifkan    = null;
+            $pengurus->diaktifkan_oleh     = null;
+            $pengurus->waktu_dinonaktifkan = null;
+            $pengurus->dinonaktifkan_oleh  = null;
+        }
+
+        $pengurus->save();
+
         return response()->json([
-            'message' => 'Nomor pengurus tidak ditemukan'
-        ], 404);
+            'message' => 'Status berhasil diperbarui.',
+        ]);
     }
-    $pengurus->update([
-        'status_akun' => $request->status_akun
-    ]);
-
-    return response()->json([
-        'message' => 'Status akun pengurus berhasil diperbarui',
-        'data' => [
-            'nama_lengkap' => $pengurus->nama_lengkap,
-            'status_akun'  => $pengurus->status_akun
-        ]
-    ]);
-}
-
-public function resetPassword($id)
-{
-
-    $pengurus = Pengurus::find($id);
-
-    if (!$pengurus) {
-        return response()->json([
-            'message' => 'Nomor tidak ditemukan'
-        ], 404);
-    }
-
-    if ($pengurus->status_akun !== 'Aktif') {
-        return response()->json([
-            'message' => 'Gagal reset. Password hanya bisa direset untuk akun dengan status Aktif.'
-        ], 422); 
-    }
-
-    $pengurus->update([
-        'status_akun' => 'Proses',
-        'password'    => null,
-    ]);
-
-    return response()->json([
-        'message' => 'Berhasil reset password',
-        'data' => [
-            'nama_lengkap' => $pengurus->nama_lengkap,
-            'status_akun'  => $pengurus->status_akun,
-            'password'     => 'NULL'
-        ]
-    ], 200);
-}
 }
 
 

@@ -19,10 +19,13 @@ return new class extends Migration
             $table->string('nomor_pengurus')->unique();
             $table->string('nomor_handphone')->unique()->nullable();
             $table->string('password')->nullable();
-            $table->enum('status_akun', ['Aktif', 'Non-Aktif', 'Proses'])
-                  ->default('Proses');
-            $table->timestamp('created_at')->useCurrent();
-            $table->timestamp('updated_at')->nullable()->useCurrentOnUpdate();
+            $table->enum('status_akun', ['Aktif', 'Non-Aktif', 'Proses'])->nullable()->default(null);
+            $table->timestamp('waktu_dibuat')->useCurrent();
+            $table->timestamp('waktu_diaktifkan')->nullable();
+            $table->timestamp('waktu_daftar_ulang')->nullable();  
+            $table->string('diaktifkan_oleh')->nullable();
+            $table->timestamp('waktu_dinonaktifkan')->nullable();
+            $table->string('dinonaktifkan_oleh')->nullable();
         });
     }
 

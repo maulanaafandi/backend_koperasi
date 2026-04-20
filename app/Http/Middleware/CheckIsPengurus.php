@@ -11,11 +11,20 @@ class CheckIsPengurus
 {
    public function handle(Request $request, Closure $next): Response
     {
-        if (! $request->user() instanceof Pengurus) {
+        $user = $request->user();
+        if (!$request->user() instanceof Pengurus || $request->user()->status_akun !== 'Aktif') {
             return response()->json([
-                'message' => 'Acces denied. Fitur ini hanya untuk Pengurus.'
+                'success' => false,
+                'message' => 'Access denied. Fitur ini hanya untuk Pengurus dengan akun aktif.'
             ], 403);
         }
+
+       if (is_null($user->password)) {
+            return response()->json([
+                'message' => 'Password Anda telah direset oleh Admin. Silakan lakukan daftar ulang untuk membuat password baru.'
+            ], 403);
+        }
+
         return $next($request);
     }
 }

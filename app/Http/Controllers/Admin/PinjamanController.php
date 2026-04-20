@@ -20,7 +20,7 @@ class PinjamanController extends Controller
             ->get();
     }
 
-        public function pengajuan()
+     public function pengajuan()
     {
         $data = Pinjaman::with('nasabah')
             ->where('status', 'proses')
@@ -59,68 +59,91 @@ public function detailPengajuan($id)
     return response()->json([
         'message' => 'Detail pengajuan',
         'data' => [
-            'nama_lengkap' => $item->nasabah->nama_lengkap,
-            'nomor_nasabah' => $item->nasabah->nomor_nasabah,
+            'nama_lengkap' => optional($item->nasabah)->nama_lengkap,
+            'nomor_nasabah' => optional($item->nasabah)->nomor_nasabah,
+            'jumlah_pinjaman' => $item->jumlah_pinjaman,
+            'status' => $item->status, 
+            'jaminan' => $item->jaminan,
+            'foto_jaminan' => $item->foto_jaminan 
+                ? asset('storage/' . $item->foto_jaminan)
+                : null,
+            'nilai_jaminan' => $item->nilai_jaminan,
             'waktu_dibuat' => $item->waktu_dibuat,
             'dibuat_oleh' => $item->dibuat_oleh,
-            'jumlah_pinjaman' => $item->jumlah_pinjaman,
-            'status' => 'Proses'
+            'waktu_disetujui' => $item->waktu_disetujui,
+            'disetujui_oleh' => $item->disetujui_oleh,
+            'waktu_tidak_disetujui' => $item->waktu_tidak_setujui,
+            'tidak_disetujui_oleh' => $item->tidak_setujui_oleh,
         ]
-    ]);
+    ], 200);
 }
 
 public function jatuhTempo()
 {
-    $data = $this->filterByStatusAngsuran('jatuh_tempo');
+    $data = Pinjaman::with([
+        'nasabah',
+        'cicilan' => function ($q) {
+            $q->where('status_angsuran', 'jatuh_tempo');
+        }
+    ])
+    ->whereHas('cicilan', function ($q) {
+        $q->where('status_angsuran', 'jatuh_tempo');
+    })
+    ->get();
 
     if ($data->isEmpty()) {
         return response()->json([
             'message' => 'Data pinjaman jatuh tempo belum ada',
             'data' => []
-        ]);
+        ], 404);
     }
 
     return response()->json([
         'message' => 'List pinjaman jatuh tempo',
         'data' => $data->map(function ($item) {
+
+            $cicilan = $item->cicilan->first();
+
             return [
-                'nama_lengkap' => $item->nasabah->nama_lengkap,
-                'nomor_nasabah' => $item->nasabah->nomor_nasabah,
+                'id' => $item->id,
+                'nama_lengkap' => optional($item->nasabah)->nama_lengkap,
+                'nomor_nasabah' => optional($item->nasabah)->nomor_nasabah,
                 'jumlah_pinjaman' => $item->jumlah_pinjaman,
-                'waktu_dibuat' => $item->waktu_dibuat,
-                'status_angsuran' => 'jatuh_tempo'
+                'tanggal_jatuh_tempo' => optional($cicilan)->tanggal_jatuh_tempo,
             ];
         })
-    ]);
+    ], 200);
 }
 
 public function detailJatuhTempo($id)
 {
-    $item = Pinjaman::with(['nasabah', 'cicilan'])
-        ->whereHas('cicilan', function ($q) {
-            $q->where('status_angsuran', 'jatuh_tempo');
-        })
-        ->find($id);
+    $item = Pinjaman::with(['nasabah', 'cicilan' => function ($q) {
+        $q->where('status_angsuran', 'jatuh_tempo');
+    }])->find($id);
 
-    if (!$item) {
+    if (!$item || $item->cicilan->isEmpty()) {
         return response()->json([
             'message' => 'Data pinjaman jatuh tempo tidak ditemukan'
         ], 404);
     }
 
+    $cicilan = $item->cicilan->first();
+
     return response()->json([
         'message' => 'Detail pinjaman jatuh tempo',
         'data' => [
-            'nama_lengkap' => $item->nasabah->nama_lengkap,
-            'nomor_nasabah' => $item->nasabah->nomor_nasabah,
+            'nama_lengkap' => optional($item->nasabah)->nama_lengkap,
+            'nomor_nasabah' => optional($item->nasabah)->nomor_nasabah,
             'jumlah_pinjaman' => $item->jumlah_pinjaman,
-            'status_angsuran' => 'jatuh_tempo',
-            'waktu_dibuat' => $item->waktu_dibuat,
-            'dibuat_oleh' => $item->dibuat_oleh,
+            'waktu_pinjaman' => $item->waktu_dibuat,
+            'nomor_angsuran' => $cicilan->nomor_angsuran,
+            'status_angsuran' => $cicilan->status_angsuran,
+            'total_tagihan' => $cicilan->total_tagihan,
+            'tanggal_jatuh_tempo' => $cicilan->tanggal_jatuh_tempo,
             'waktu_disetujui' => $item->waktu_disetujui,
             'disetujui_oleh' => $item->disetujui_oleh,
         ]
-    ]);
+    ], 200);
 }
 
 public function macet()
@@ -131,51 +154,63 @@ public function macet()
         return response()->json([
             'message' => 'Data pinjaman macet belum ada',
             'data' => []
-        ]);
+        ], 404);
     }
 
     return response()->json([
         'message' => 'List pinjaman macet',
         'data' => $data->map(function ($item) {
+
+            $cicilan = $item->cicilan->first();
             return [
-                'nama_lengkap' => $item->nasabah->nama_lengkap,
-                'nomor_nasabah' => $item->nasabah->nomor_nasabah,
+                'id' => $item->id,
+                'nama_lengkap' => optional($item->nasabah)->nama_lengkap,
+                'nomor_nasabah' => optional($item->nasabah)->nomor_nasabah,
                 'jumlah_pinjaman' => $item->jumlah_pinjaman,
-                'waktu_dibuat' => $item->waktu_dibuat,
-                'status_angsuran' => 'macet'
+                'status_angsuran' => optional($cicilan)->status_angsuran,
             ];
         })
-    ]);
+    ], 200);
 }
 
 public function detailMacet($id)
 {
-    $item = Pinjaman::with(['nasabah', 'cicilan'])
-        ->whereHas('cicilan', function ($q) {
+    $item = Pinjaman::with([
+        'nasabah',
+        'cicilan' => function ($q) {
             $q->where('status_angsuran', 'macet');
-        })
-        ->find($id);
+        }
+    ])
+    ->whereHas('cicilan', function ($q) {
+        $q->where('status_angsuran', 'macet');
+    })
+    ->find($id);
 
-    if (!$item) {
+    if (!$item || $item->cicilan->isEmpty()) {
         return response()->json([
             'message' => 'Data pinjaman macet tidak ditemukan'
         ], 404);
     }
 
+    $cicilan = $item->cicilan->first();
     return response()->json([
         'message' => 'Detail pinjaman macet',
         'data' => [
-            'nama_lengkap' => $item->nasabah->nama_lengkap,
-            'nomor_nasabah' => $item->nasabah->nomor_nasabah,
+            'nama_lengkap' => optional($item->nasabah)->nama_lengkap,
+            'nomor_nasabah' => optional($item->nasabah)->nomor_nasabah,
+
             'jumlah_pinjaman' => $item->jumlah_pinjaman,
-            'waktu_pinjaman' => $item->created_at,
-            'status_angsuran' => 'macet',
-            'waktu_dibuat' => $item->waktu_dibuat,
-            'dibuat_oleh' => $item->dibuat_oleh,
+            'waktu_pinjaman' => $item->waktu_dibuat,
+
+            'nomor_angsuran' => $cicilan->nomor_angsuran,
+            'status_angsuran' => $cicilan->status_angsuran,
+            'total_tagihan' => $cicilan->total_tagihan,
+            'tanggal_jatuh_tempo' => $cicilan->tanggal_jatuh_tempo,
+
             'waktu_disetujui' => $item->waktu_disetujui,
             'disetujui_oleh' => $item->disetujui_oleh,
         ]
-    ]);
+    ], 200);
 }
 
 public function lunas()
@@ -186,49 +221,59 @@ public function lunas()
         return response()->json([
             'message' => 'Data pinjaman lunas belum ada',
             'data' => []
-        ]);
+        ], 404);
     }
 
     return response()->json([
         'message' => 'List pinjaman lunas',
         'data' => $data->map(function ($item) {
+
+            $cicilan = $item->cicilan->first();
             return [
-                'nama_lengkap' => $item->nasabah->nama_lengkap,
-                'nomor_nasabah' => $item->nasabah->nomor_nasabah,
+                'id' => $item->id,
+                'nama_lengkap' => optional($item->nasabah)->nama_lengkap,
+                'nomor_nasabah' => optional($item->nasabah)->nomor_nasabah,
                 'jumlah_pinjaman' => $item->jumlah_pinjaman,
-                'waktu_dibuat' => $item->waktu_dibuat,
-                'status_angsuran' => 'lunas'
+                'status_angsuran' => optional($cicilan)->status_angsuran,
             ];
         })
-    ]);
+    ], 200);
 }
 
 public function detailLunas($id)
 {
-    $item = Pinjaman::with(['nasabah', 'cicilan'])
-        ->whereHas('cicilan', function ($q) {
+    $item = Pinjaman::with([
+        'nasabah',
+        'cicilan' => function ($q) {
             $q->where('status_angsuran', 'lunas');
-        })
-        ->find($id);
+        }
+    ])
+    ->whereHas('cicilan', function ($q) {
+        $q->where('status_angsuran', 'lunas');
+    })
+    ->find($id);
 
-    if (!$item) {
+    if (!$item || $item->cicilan->isEmpty()) {
         return response()->json([
             'message' => 'Data pinjaman lunas tidak ditemukan'
         ], 404);
     }
 
+    $cicilan = $item->cicilan->first();
     return response()->json([
         'message' => 'Detail pinjaman lunas',
         'data' => [
-            'nama_lengkap' => $item->nasabah->nama_lengkap,
-            'nomor_nasabah' => $item->nasabah->nomor_nasabah,
+            'nama_lengkap' => optional($item->nasabah)->nama_lengkap,
+            'nomor_nasabah' => optional($item->nasabah)->nomor_nasabah,
             'jumlah_pinjaman' => $item->jumlah_pinjaman,
-            'status_angsuran' => 'lunas',
-            'waktu_dibuat' => $item->waktu_dibuat,
-            'dibuat_oleh' => $item->dibuat_oleh,
+            'waktu_pinjaman' => $item->waktu_dibuat,
+            'nomor_angsuran' => $cicilan->nomor_angsuran,
+            'status_angsuran' => $cicilan->status_angsuran,
+            'total_tagihan' => $cicilan->total_tagihan,
+            'tanggal_jatuh_tempo' => $cicilan->tanggal_jatuh_tempo,
             'waktu_disetujui' => $item->waktu_disetujui,
             'disetujui_oleh' => $item->disetujui_oleh,
         ]
-    ]);
+    ], 200);
 }
 }

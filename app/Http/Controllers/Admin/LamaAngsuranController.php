@@ -10,48 +10,46 @@ use Illuminate\Support\Facades\Validator;
 class LamaAngsuranController extends Controller
 {
 
-    public function index()
+public function index()
     {
-        $data = Tenor::all();
+        $data = Tenor::select('id', 'tipe', 'lama_angsuran', 'bunga', 'bunga_keterlambatan')->get();
         return response()->json([
-            'success' => true,
-            'data'    => $data
+            'data' => $data
         ], 200);
     }
 
-    public function store(Request $request)
+public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'tenor' => 'required|integer|min:1|max:24',
-            'tipe'  => 'required|in:Anggota,Non-Anggota',
-        ], [
-            'tenor.min' => 'Lama angsuran minimal adalah 1 bulan.',
-            'tenor.max' => 'Lama angsuran maksimal adalah 24 bulan.',
-            'tipe.in'   => 'Pilihan hanya Anggota atau Non-Anggota.',
+            'tipe'                => 'required|in:Anggota,Non-Anggota',
+            'lama_angsuran'       => 'required|integer|min:1|max:24',
+            'bunga'               => 'required|numeric|min:0',
+            'bunga_keterlambatan' => 'required|numeric|min:0',
         ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
 
-        $isExist = Tenor::where('tenor', $request->tenor)
-                    ->where('tipe', $request->tipe)
-                    ->exists();
+        $isExist = Tenor::where('tipe', $request->tipe)
+                        ->where('lama_angsuran', $request->lama_angsuran)
+                        ->exists();
 
         if ($isExist) {
             return response()->json([
-                'message' => "Data lama angsuran {$request->tenor} bulan untuk {$request->tipe} sudah ada."
+                'message' => "Data lama angsuran {$request->lama_angsuran} bulan untuk {$request->tipe} sudah ada."
             ], 422);
         }
 
-        $bunga = ($request->tipe === 'Anggota') ? 1.00 : 2.00;
-
-        $admin = auth()->user()->nama_lengkap ?? 'Admin';
+        $nomorAdmin = auth()->user()->nomor_admin ?? 'ADM000';
         $tenor = Tenor::create([
-            'tenor' => $request->tenor,
-            'tipe'  => $request->tipe,
-            'bunga' => $bunga,
-            'created_by' => $admin,
+            'tipe'                => $request->tipe,
+            'lama_angsuran'       => $request->lama_angsuran,
+            'bunga'               => $request->bunga,
+            'bunga_keterlambatan' => $request->bunga_keterlambatan,
+            'dibuat_oleh'         => $nomorAdmin,
+            'waktu_diubah'        => null,
+            'diubah_oleh'         => null,
         ]);
 
         return response()->json([
@@ -59,67 +57,106 @@ class LamaAngsuranController extends Controller
         ], 201);
     }
 
-    public function show($id)
+ public function show($id)
     {
         $tenor = Tenor::find($id);
 
         if (!$tenor) {
             return response()->json(['message' => 'Data tidak ditemukan'], 404);
         }
-        
-        return response()->json([ 
-            'data'    => $tenor
+
+        return response()->json([
+            'id'                  => $tenor->id,
+            'tipe'                => $tenor->tipe,
+            'lama_angsuran'       => $tenor->lama_angsuran,
+            'bunga'               => $tenor->bunga,
+            'bunga_keterlambatan' => $tenor->bunga_keterlambatan,
+            'waktu_dibuat'        => $tenor->waktu_dibuat ? $tenor->waktu_dibuat->format('Y-m-d H:i:s') : null,
+            'dibuat_oleh'         => $tenor->dibuat_oleh,
+            'waktu_diubah'        => $tenor->waktu_diubah ? $tenor->waktu_diubah->format('Y-m-d H:i:s') : null,
+            'diubah_oleh'         => $tenor->diubah_oleh,
+        ], 200);
+    }
+
+        public function getById($id)
+    {
+        $tenor = Tenor::select('id', 'tipe', 'lama_angsuran', 'bunga', 'bunga_keterlambatan')
+                    ->find($id);
+
+        if (!$tenor) {
+            return response()->json([
+                'message' => 'Data tidak ditemukan'
+            ], 404);
+        }
+
+        return response()->json([
+            'id'                  => $tenor->id,
+            'tipe'                => $tenor->tipe,
+            'lama_angsuran'       => $tenor->lama_angsuran,
+            'bunga'               => $tenor->bunga,
+            'bunga_keterlambatan' => $tenor->bunga_keterlambatan,
         ], 200);
     }
 
 public function update(Request $request, $id)
-{
-    $tenor = Tenor::find($id);
+    {
+        $tenor = Tenor::find($id);
 
-    if (!$tenor) {
-        return response()->json(['message' => 'Data tidak ditemukan'], 404);
-    }
+        if (!$tenor) {
+            return response()->json(['message' => 'Data tidak ditemukan'], 404);
+        }
 
-    $validator = Validator::make($request->all(), [
-        'tenor' => 'required|integer|min:1|max:24',
-        'tipe'  => 'required|in:Anggota,Non-Anggota',
-    ], [
-        'tenor.min' => 'Lama angsuran minimal adalah 1 bulan.',
-        'tenor.max' => 'Lama angsuran maksimal adalah 24 bulan.',
-    ]);
+        $validator = Validator::make($request->all(), [
+            'tipe'                => 'required|in:Anggota,Non-Anggota',
+            'lama_angsuran'       => 'required|integer|min:1|max:60',
+            'bunga'               => 'required|numeric|min:0',
+            'bunga_keterlambatan' => 'required|numeric|min:0',
+        ]);
 
-    if ($validator->fails()) {
-        return response()->json($validator->errors(), 422);
-    }
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
 
-    $isExist = Tenor::where('tenor', $request->tenor)
-                ->where('tipe', $request->tipe)
-                ->where('id', '!=', $id)
-                ->exists();
+        $isExist = Tenor::where('tipe', $request->tipe)
+                        ->where('lama_angsuran', $request->lama_angsuran)
+                        ->where('id', '!=', $id)
+                        ->exists();
 
-    if ($isExist) {
+        if ($isExist) {
+            return response()->json([
+                'message' => "Gagal update! Data lama angsuran {$request->lama_angsuran} bulan untuk {$request->tipe} sudah ada."
+            ], 422);
+        }
+
+        $nomorAdmin = auth()->user()->nomor_admin ?? 'ADM000';
+
+        $tenor->update([
+            'tipe'                => $request->tipe,
+            'lama_angsuran'       => $request->lama_angsuran,
+            'bunga'               => $request->bunga,
+            'bunga_keterlambatan' => $request->bunga_keterlambatan,
+            'diubah_oleh'         => $nomorAdmin,
+        ]);
+
         return response()->json([
-            'message' => "Gagal update! Data tenor {$request->tenor} bulan untuk {$request->tipe} sudah ada."
-        ], 422);
+            'message' => "Data lama angsuran berhasil diperbarui.",
+        ], 200);
     }
 
-    $bungaBaru = ($request->tipe === 'Anggota') ? 1.00 : 2.00;
+    public function destroy($id)
+    {
+        $tenor = Tenor::find($id);
 
-    $tenorLama = $tenor->tenor;
-    $tipeLama  = $tenor->tipe;
-
-    $admin = auth()->user()->nama_lengkap ?? 'Admin';
-
-    $tenor->update([
-        'tenor'      => $request->tenor,
-        'tipe'       => $request->tipe,
-        'bunga'      => $bungaBaru, 
-        'updated_at' => \Carbon\Carbon::now(), 
-        'updated_by' => $admin,
-    ]);
-
-    return response()->json([
-        'message' => "Data lama angsuran berhasil diperbarui dari {$tipeLama} - {$tenorLama} bulan menjadi {$request->tipe} - {$request->tenor} bulan.",
-    ], 200);
-}
+        if (!$tenor) {
+            return response()->json(['message' => 'Data tidak ditemukan'], 404);
+        }
+        try {
+            $tenor->delete();
+            return response()->json(['message' => 'Data lama angsuran berhasil dihapus'], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Gagal menghapus. Data ini kemungkinan sedang digunakan oleh data lain.'
+            ], 400);
+        }
+    }
 }

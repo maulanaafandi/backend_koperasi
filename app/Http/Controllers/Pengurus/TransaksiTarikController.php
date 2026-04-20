@@ -1,0 +1,136 @@
+<?php
+
+namespace App\Http\Controllers\Pengurus;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
+use App\Models\Transaksi;
+use App\Models\Nasabah;
+
+class TransaksiTarikController extends Controller
+{
+ public function tarik(Request $request)
+{
+    $request->validate([
+        'nomor_rekening' => 'required|exists:nasabah,nomor_rekening',
+        'saldo' => 'required|numeric|min:1'
+    ]);
+
+    return DB::transaction(function () use ($request) {
+
+        $nasabah = Nasabah::where('nomor_rekening', $request->nomor_rekening)->first();
+
+        if (!$nasabah) {
+            return response()->json([
+                'message' => 'Rekening tidak ditemukan'
+            ], 404);
+        }
+
+        if ($nasabah->tipe === 'Anggota') {
+            return response()->json([
+                'message' => 'Penarikan tidak diizinkan untuk nasabah dengan status Anggota.'
+            ], 403);
+        }
+
+        $saldoSebelum = $nasabah->saldo;
+        $jumlah       = $request->saldo;
+
+        if ($saldoSebelum < $jumlah) {
+            return response()->json([
+                'message' => 'Saldo tidak mencukupi'
+            ], 400);
+        }
+
+        $saldoSesudah = $saldoSebelum - $jumlah;
+
+        $kodeTransaksi = 'TRX-' . strtoupper(Str::random(10));
+
+        $pengurusLogin = optional(auth()->user())->nomor_pengurus ?? 'PGR000';
+
+        $transaksi = Transaksi::create([
+            'id_nasabah'        => $nasabah->id,
+            'kode_transaksi'    => $kodeTransaksi,
+            'jenis_transaksi'   => 'tarik_tunai',
+            'saldo'             => $jumlah,
+            'saldo_sebelum'     => $saldoSebelum,
+            'saldo_sesudah'     => $saldoSesudah,
+            'status_transaksi'  => 'sukses',
+            'dibuat_oleh'       => $pengurusLogin,
+            'waktu_transaksi_sukses' => now()
+        ]);
+
+        $nasabah->saldo = $saldoSesudah;
+        $nasabah->save();
+
+        return response()->json([
+            'message' => 'Penarikan berhasil',
+            'data' => [
+                'kode_transaksi'   => $transaksi->kode_transaksi,
+                'jenis_transaksi'  => $transaksi->jenis_transaksi,
+                'saldo'            => $transaksi->saldo,
+                'saldo_sebelum'    => $transaksi->saldo_sebelum,
+                'saldo_sesudah'    => $transaksi->saldo_sesudah,
+                'status_transaksi' => $transaksi->status_transaksi,
+                'dibuat_oleh'      => $transaksi->dibuat_oleh,
+                'waktu_dibuat'     => $transaksi->waktu_dibuat,
+            ]
+        ], 200);
+    });
+}
+
+public function indexTarik()
+{
+    $data = Transaksi::with('nasabah')
+        ->where('jenis_transaksi', 'tarik_tunai')
+        ->get();
+
+    if ($data->isEmpty()) {
+        return response()->json([
+            'message' => 'Data transaksi tarik belum ada',
+            'data' => []
+        ]);
+    }
+
+    return response()->json([
+        'message' => 'List transaksi tarik',
+        'data' => $data->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'nama_lengkap' => optional($item->nasabah)->nama_lengkap,
+                'nomor_rekening' => optional($item->nasabah)->nomor_rekening,
+                'jenis_transaksi' => $item->jenis_transaksi
+            ];
+        })
+    ]);
+}
+
+public function detailTarik($id)
+{
+    $item = Transaksi::with('nasabah')
+        ->where('jenis_transaksi', 'tarik_tunai')
+        ->find($id);
+
+    if (!$item) {
+        return response()->json([
+            'message' => 'Data tidak ditemukan'
+        ], 404);
+    }
+
+    return response()->json([
+        'message' => 'Detail transaksi tarik',
+        'data' => [
+            'nama_lengkap' => optional($item->nasabah)->nama_lengkap,
+            'nomor_rekening' => optional($item->nasabah)->nomor_rekening,
+            'kode_transaksi' => $item->kode_transaksi,
+            'jenis_transaksi' => $item->jenis_transaksi,
+            'saldo' => $item->saldo,
+            'saldo_sebelum' => $item->saldo_sebelum,
+            'saldo_sesudah' => $item->saldo_sesudah,
+            'waktu_dibuat' => $item->waktu_dibuat,
+            'dibuat_oleh' => $item->dibuat_oleh,
+        ]
+    ]);
+}
+}

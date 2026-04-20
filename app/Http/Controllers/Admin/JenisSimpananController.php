@@ -10,93 +10,133 @@ use Carbon\Carbon;
 
 class JenisSimpananController extends Controller
 {
-public function index()
-    {
-        $data = JenisSimpanan::all();
-        return response()->json([
-            'data' => $data
-        ], 200);
-    }
-
- public function store(Request $request)
+    public function index()
 {
+    $jenisSimpanan = JenisSimpanan::all();
+    $data = $jenisSimpanan->map(function ($item) {
+        return [
+            'nama_simpanan' => $item->nama_simpanan,
+            'saldo_minimal' => $item->saldo_minimal,
+        ];
+    });
 
-    if ($request->has('jenis_simpanan')) {
+    return response()->json([
+        'data' => $data
+    ], 200);
+}
+
+public function store(Request $request)
+{
+    if ($request->has('nama_simpanan')) {
         $request->merge([
-            'jenis_simpanan' => ucwords(strtolower($request->jenis_simpanan)),
+            'nama_simpanan' => ucwords(strtolower($request->nama_simpanan)),
         ]);
     }
 
     $validator = Validator::make($request->all(), [
-        'jenis_simpanan' => 'required|string|unique:jenis_simpanan,jenis_simpanan',
-        'saldo_minimum'  => 'required_unless:jenis_simpanan,Sukarela|nullable|numeric|min:0', 
+        'nama_simpanan' => 'required|string|unique:jenis_simpanan,nama_simpanan',
+        'saldo_minimal' => 'required_unless:nama_simpanan,Sukarela|nullable|numeric|min:0', 
     ], [
-        'jenis_simpanan.unique' => 'Jenis simpanan ini sudah terdaftar.',
-        'saldo_minimum.required_unless' => 'Saldo minimum wajib diisi untuk jenis simpanan ini.',
-        'saldo_minimum.numeric' => 'Saldo minimum harus berupa angka.',
+        'nama_simpanan.unique' => 'Nama simpanan ini sudah terdaftar.',
+        'saldo_minimal.required_unless' => 'Saldo minimal wajib diisi.',
     ]);
 
     if ($validator->fails()) {
         return response()->json($validator->errors(), 422);
     }
 
-    $admin = auth()->user()->nama_lengkap ?? 'Admin';
-    $saldo = $request->saldo_minimum;
-    if ($request->jenis_simpanan === 'Sukarela'  && $saldo === null) {
+    $nomorAdmin = auth()->user()->nomor_admin ?? 'ADM000';
+    $saldo = $request->saldo_minimal;
+
+    if ($request->nama_simpanan === 'Sukarela' && $saldo === null) {
         $saldo = 0;
     }
 
-    $jenis = JenisSimpanan::create([
-        'jenis_simpanan' => $request->jenis_simpanan,
-        'saldo_minimum'  => $saldo, 
+    JenisSimpanan::create([
+        'nama_simpanan' => $request->nama_simpanan,
+        'saldo_minimal' => $saldo,
+        'dibuat_oleh'   => $nomorAdmin,
+        'diubah_oleh'   => null,
+        'waktu_diubah'  => null,
     ]);
 
     return response()->json([
         'message' => 'Jenis simpanan berhasil ditambahkan',
-        'data'    => $jenis
     ], 201);
 }
 
-    public function show($id)
-    {
-        $jenis = JenisSimpanan::find($id);
-        if (!$jenis) {
-            return response()->json(['message' => 'Data tidak ditemukan'], 404);
-        }
+public function show($id)
+{
+    $jenis = JenisSimpanan::find($id);
 
-        return response()->json(['data' => $jenis], 200);
-    }
-
-    public function update(Request $request, $id)
-    {
-        $jenis = JenisSimpanan::find($id);
-        if (!$jenis) {
-            return response()->json(['message' => 'Data tidak ditemukan'], 404);
-        }
-
-        $validator = Validator::make($request->all(), [
-            'jenis_simpanan' => 'required|string|unique:jenis_simpanan,jenis_simpanan,' . $id,
-            'saldo_minimum'  => 'required|numeric|min:0',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
-
-        $admin = auth()->user()->nama_lengkap ?? 'Admin';
-
-        $jenis->update([
-            'jenis_simpanan' => $request->jenis_simpanan,
-            'saldo_minimum'  => $request->saldo_minimum,
-            'updated_at'      => Carbon::now(), 
-            'updated_by'      => $admin,
-        ]);
-
+    if (!$jenis) {
         return response()->json([
-            'message' => 'Jenis simpanan berhasil diupdate',
-            'data'    => $jenis
-        ], 200);
+            'message' => 'Data tidak ditemukan'
+        ], 404);
     }
+
+    return response()->json([
+        'nama_simpanan' => $jenis->nama_simpanan,
+        'saldo_minimal' => $jenis->saldo_minimal,
+        'waktu_dibuat'  => $jenis->waktu_dibuat ? $jenis->waktu_dibuat->format('Y-m-d H:i:s') : null,
+        'dibuat_oleh'   => $jenis->dibuat_oleh,
+        'waktu_diubah'  => $jenis->waktu_diubah ? $jenis->waktu_diubah->format('Y-m-d H:i:s') : null,
+        'diubah_oleh'   => $jenis->diubah_oleh,
+    ], 200);
+}
+
+public function getById($id)
+{
+    $jenis = JenisSimpanan::find($id);
+
+    if (!$jenis) {
+        return response()->json([
+            'message' => 'Data tidak ditemukan'
+        ], 404);
+    }
+
+    return response()->json([
+        'nama_simpanan' => $jenis->nama_simpanan,
+        'saldo_minimal' => $jenis->saldo_minimal,
+    ], 200);
+}
+
+
+public function update(Request $request, $id)
+{
+    $jenis = JenisSimpanan::find($id);
+
+    if (!$jenis) {
+        return response()->json(['message' => 'Data tidak ditemukan'], 404);
+    }
+
+    if ($request->has('nama_simpanan')) {
+        $request->merge([
+            'nama_simpanan' => ucwords(strtolower($request->nama_simpanan)),
+        ]);
+    }
+
+    $validator = Validator::make($request->all(), [
+        'nama_simpanan' => 'required|string|unique:jenis_simpanan,nama_simpanan,' . $id,
+        'saldo_minimal' => 'required|numeric|min:0',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json($validator->errors(), 422);
+    }
+
+    $nomorAdmin = auth()->user()->nomor_admin ?? 'ADM000';
+
+    $jenis->update([
+        'nama_simpanan' => $request->nama_simpanan,
+        'saldo_minimal' => $request->saldo_minimal,
+        'diubah_oleh'   => $nomorAdmin,
+    ]);
+
+    return response()->json([
+        'message' => 'Jenis simpanan berhasil diperbarui',
+    ], 200);
+}
 
     public function destroy($id)
     {

@@ -61,11 +61,6 @@ class Nasabah extends Authenticatable
         'waktu_dinonaktifkan' => 'datetime',
     ];
 
-    protected function setPasswordAttribute($value)
-    {
-        $this->attributes['password'] = $value ? Hash::make($value) : null;
-    }
-
     protected function setPinAttribute($value)
     {
         $this->attributes['pin'] = Hash::make($value);

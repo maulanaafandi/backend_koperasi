@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Admin;
 use App\Models\Pengurus;
-use App\Models\Anggota;
+use App\Models\Nasabah;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -123,5 +123,73 @@ public function daftarUlangPengurus(Request $request)
     $pengurus->save();
 
     return response()->json(['message' => 'Daftar ulang berhasil. Menunggu verifikasi admin.'], 200);
+}
+
+public function daftarUlangNasabah(Request $request)
+{
+    $request->validate([
+        'nomor_nasabah' => 'required|exists:nasabah,nomor_nasabah',
+        'password' => 'required|min:6|confirmed',
+    ]);
+
+    $nasabah = Nasabah::where('nomor_nasabah', $request->nomor_nasabah)->first();
+
+    if (!$nasabah) {
+        return response()->json([
+            'message' => 'Nasabah tidak ditemukan'
+        ], 404);
+    }
+
+    if ($nasabah->password !== null) {
+        return response()->json([
+            'message' => 'Akun anda sudah pernah daftar ulang'
+        ], 422);
+    }
+
+    $nasabah->password = Hash::make($request->password);
+    $nasabah->save();
+
+    return response()->json([
+        'message' => 'Daftar ulang berhasil, silakan login'
+    ], 200);
+}
+
+public function loginNasabah(Request $request)
+{
+    $request->validate([
+        'nomor_nasabah' => 'required|exists:nasabah,nomor_nasabah',
+        'password' => 'required'
+    ]);
+
+    $nasabah = Nasabah::where('nomor_nasabah', $request->nomor_nasabah)->first();
+
+    if (!$nasabah) {
+        return response()->json([
+            'message' => 'Nasabah tidak ditemukan'
+        ], 404);
+    }
+
+    if ($nasabah->password === null) {
+        return response()->json([
+            'message' => 'Silakan daftar ulang terlebih dahulu'
+        ], 403);
+    }
+
+    if ($nasabah->status !== 'Aktif') {
+        return response()->json([
+            'message' => 'Akun tidak aktif'
+        ], 403);
+    }
+
+    if (!Hash::check($request->password, $nasabah->password)) {
+        return response()->json([
+            'message' => 'Password salah'
+        ], 422);
+    }
+
+    $token = $nasabah->createToken('nasabah_token')->plainTextToken;
+    return response()->json([
+        'token' => $token
+    ], 200);
 }
 }

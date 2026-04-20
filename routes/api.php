@@ -22,7 +22,9 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 Route::post('/admin/login', [AuthController::class, 'loginAdmin']);
 Route::post('/pengurus/login', [AuthController::class, 'loginPengurus']);
+Route::post('/nasabah/login', [AuthController::class, 'loginNasabah']);
 Route::post('/daftar-ulang-pengurus', [AuthController::class, 'daftarUlangPengurus']);
+Route::post('/daftar-ulang-nasabah', [AuthController::class, 'daftarUlangNasabah']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 
 Route::middleware(['auth:sanctum', 'is_admin'])->group(function () {
@@ -88,5 +90,9 @@ Route::middleware(['auth:sanctum', 'is_pengurus'])->group(function () {
     Route::patch('/pengurus/update-pengumuman/{id}', [PengumumanController::class, 'update']);
     Route::post('/pengurus/update-foto-pengumuman/{id}', [PengumumanController::class, 'updateFoto']);
     Route::delete('/pengurus/hapus-pengumuman/{id}', [PengumumanController::class, 'destroy']);
+});
+
+Route::middleware(['auth:sanctum', 'is_nasabah'])->group(function () {
+
 });
 

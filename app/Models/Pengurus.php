@@ -25,9 +25,18 @@ class Pengurus extends Authenticatable
         'password',
         'status_akun',
         'waktu_diaktifkan',
+        'waktu_daftar_ulang',
         'diaktifkan_oleh',
         'waktu_dinonaktifkan',
         'dinonaktifkan_oleh'
     ];
+
+    protected $casts = [
+        'waktu_dibuat' => 'datetime',
+        'waktu_diaktifkan' => 'datetime',
+        'waktu_daftar_ulang' => 'datetime',
+        'waktu_dinonaktifkan' => 'datetime',
+    ];
+
     protected $hidden = ['password'];
 }

@@ -4,22 +4,21 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Simpanan extends Model
+class Penarikan extends Model
 {
-    protected $table = 'simpanan';
-
+    protected $table = 'penarikan';
     public $timestamps = true;
     const CREATED_AT = 'waktu_dibuat';
     const UPDATED_AT = null;
-    
+
     protected $fillable = [
         'id_transaksi',
-        'jumlah_simpanan',
+        'jumlah_penarikan',
         'dibuat_oleh'
-        ];
+    ];
 
     protected $casts = [
-        'jumlah_simpanan' => 'decimal:2',
+        'jumlah_penarikan' => 'decimal:2',
         'waktu_dibuat' => 'datetime',
     ];
 

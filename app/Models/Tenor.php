@@ -7,22 +7,26 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Tenor extends Model
 {
-    public $timestamps = false;
     protected $table = 'tenor';
+    public $timestamps = true;
+    const CREATED_AT = 'waktu_dibuat';
+    const UPDATED_AT = 'waktu_diubah';
     protected $fillable = [
-        'tenor',
         'tipe',
+        'lama_angsuran',
         'bunga',
-        'created_by',
-        'updated_at',
-        'updated_by'
+        'bunga_keterlambatan',
+        'waktu_dibuat',
+        'dibuat_oleh',
+        'waktu_diubah',
+        'diubah_oleh'
         ];
-    /**
-     * Relasi ke model Pinjaman.
-     * Satu tenor bisa digunakan oleh banyak data pinjaman.
-     */
-    public function pinjaman(): HasMany
-    {
-        return $this->hasMany(Pinjaman::class, 'id_tenor');
-    }
+
+    protected $casts = [
+        'bunga' => 'decimal:2',
+        'bunga_keterlambatan' => 'decimal:2',
+        'tenor' => 'integer',
+        'lama_angsuran' => 'integer',
+    ];
+
 }

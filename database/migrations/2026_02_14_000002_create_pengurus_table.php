@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('password')->nullable();
             $table->enum('status_akun', ['Aktif', 'Non-Aktif', 'Proses'])->nullable()->default(null);
             $table->timestamp('waktu_dibuat')->useCurrent();
+            $table->string('dibuat_oleh')->nullable();
             $table->timestamp('waktu_diaktifkan')->nullable();
             $table->timestamp('waktu_daftar_ulang')->nullable();  
             $table->string('diaktifkan_oleh')->nullable();

@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Hash; 
 use Carbon\Carbon;
 
 class NasabahManagementController extends Controller
@@ -147,7 +148,8 @@ public function getStatus($id)
 
     $nasabah->status = 'Aktif';
     $nasabah->saldo = 0;
-    $nasabah->pin = Str::random(6); 
+    // $nasabah->pin = Str::random(6);
+    $nasabah->pin = Hash::make('123456');
     $nasabah->dibuat_oleh = $pengurusLogin;
     $nasabah->waktu_diaktifkan = now();
     $nasabah->diaktifkan_oleh = $pengurusLogin;
@@ -186,7 +188,6 @@ public function updateStatus(Request $request, $id)
         $nasabah->waktu_diaktifkan = now();
         $nasabah->diaktifkan_oleh = $pengurusLogin;
 
-        // reset non aktif
         $nasabah->waktu_dinonaktifkan = null;
         $nasabah->dinonaktifkan_oleh = null;
 

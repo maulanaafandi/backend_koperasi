@@ -39,8 +39,11 @@ public function store(Request $request)
     $nomorUrut = $lastPengurus ? str_pad((int)substr($lastPengurus->nomor_pengurus, -4) + 1, 4, '0', STR_PAD_LEFT) : '0001';
     $nomorPengurusOtomatis = "PGR-" . $tahun . $nomorUrut;
 
+    $adminLogin = auth()->user()->nomor_admin ?? 'Admin';
+
     $pengurus = new Pengurus();
     $pengurus->nomor_pengurus = $nomorPengurusOtomatis;
+    $pengurus->dibuat_oleh    = $adminLogin;
     $pengurus->status_akun    = null; 
     $pengurus->save();
 

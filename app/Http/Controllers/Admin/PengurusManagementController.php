@@ -14,7 +14,7 @@ class PengurusManagementController extends Controller
 {
 public function index()
     {
-        $pengurus = Pengurus::select('id', 'foto_profil', 'nama_lengkap', 'nomor_pengurus')
+        $pengurus = Pengurus::select('id', 'nama_lengkap','status_akun', 'nomor_pengurus')
                             ->orderBy('waktu_dibuat', 'desc') 
                             ->get();
 

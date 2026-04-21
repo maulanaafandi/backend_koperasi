@@ -24,6 +24,7 @@ class Pengurus extends Authenticatable
         'nomor_handphone',
         'password',
         'status_akun',
+        'dibuat_oleh',
         'waktu_diaktifkan',
         'waktu_daftar_ulang',
         'diaktifkan_oleh',

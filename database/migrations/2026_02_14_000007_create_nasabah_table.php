@@ -43,7 +43,7 @@ return new class extends Migration
             $table->string('dinonaktifkan_oleh')->nullable();
             $table->string('nomor_rekening')->unique();
             $table->enum('tipe', ['Non-Anggota', 'Anggota']);
-            $table->string('pin');
+            $table->string('pin')->nullable();
             $table->decimal('saldo', 15, 2)->default(0); 
         });
     }

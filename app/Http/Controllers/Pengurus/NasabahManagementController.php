@@ -148,8 +148,7 @@ public function getStatus($id)
 
     $nasabah->status = 'Aktif';
     $nasabah->saldo = 0;
-    // $nasabah->pin = Str::random(6);
-    $nasabah->pin = Hash::make('123456');
+    $nasabah->pin = null;
     $nasabah->dibuat_oleh = $pengurusLogin;
     $nasabah->waktu_diaktifkan = now();
     $nasabah->diaktifkan_oleh = $pengurusLogin;

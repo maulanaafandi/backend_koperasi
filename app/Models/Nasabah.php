@@ -63,7 +63,7 @@ class Nasabah extends Authenticatable
 
     protected function setPinAttribute($value)
     {
-        $this->attributes['pin'] = Hash::make($value);
+        $this->attributes['pin'] = $value ? Hash::make($value) : null;
     }
 
     public function jenisSimpanan()

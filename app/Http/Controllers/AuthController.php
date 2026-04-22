@@ -12,80 +12,78 @@ use Illuminate\Validation\Rules\Password;
 
 class AuthController extends Controller
 {
-    public function loginAdmin(Request $request) {
-        $request->validate(['nomor_admin' => 'required', 'password' => 'required']);
-        
-        $admin = Admin::where('nomor_admin', $request->nomor_admin)->first();
-
-        if (!$admin) {
-            return response()->json(['message' => 'Akun belum terdaftar, silahkan melakukan registrasi akun terlebih dahulu'], 404);
-        }
-
-        if (!Hash::check($request->password, $admin->password)) {
-            return response()->json(['message' => 'Kredensial (password) salah'], 401);
-        }
-
-        $token = $admin->createToken('admin_token')->plainTextToken;
-        return response()->json(['token' => $token]);
-    }
-
-public function logout(Request $request)
-    {
-        $user = $request->user();
-
-        if ($user) {
-            $user->currentAccessToken()->delete();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Logout berhasil. Sesi untuk ' . class_basename($user) . ' telah diakhiri.'
-            ], 200);
-        }
-
-        return response()->json([
-            'success' => false,
-            'message' => 'Gagal logout, token tidak valid atau sudah tidak aktif.'
-        ], 401);
-    }
-
-public function loginPengurus(Request $request) {
+   public function login(Request $request)
+{
     $request->validate([
-        'nomor_pengurus' => 'required',
         'password' => 'required'
     ]);
 
-    $pengurus = Pengurus::where('nomor_pengurus', $request->nomor_pengurus)->first();
+    if ($request->filled('nomor_admin')) {
+        $request->validate([
+            'nomor_admin' => 'exists:admin,nomor_admin'
+        ]);
 
-    if (!$pengurus) {
+        $admin = Admin::where('nomor_admin', $request->nomor_admin)->first();
+
+        if ($admin->password === null) {
+            return response()->json([
+                'message' => 'Silakan daftar ulang terlebih dahulu'
+            ], 403);
+        }
+
+        if (!Hash::check($request->password, $admin->password)) {
+            return response()->json([
+                'message' => 'Password salah'
+            ], 422);
+        }
+
+        $token = $admin->createToken('admin_token')->plainTextToken;
+
         return response()->json([
-            'message' => 'Nomor pengurus tidak terdaftar.'
-        ], 404); 
+            'message' => 'Login admin berhasil',
+            'token' => $token,
+        ]);
     }
 
+    if ($request->filled('nomor_pengurus')) {
 
-    if (is_null($pengurus->password)) {
+        $request->validate([
+            'nomor_pengurus' => 'exists:pengurus,nomor_pengurus'
+        ]);
+
+        $pengurus = Pengurus::where('nomor_pengurus', $request->nomor_pengurus)->first();
+
+        if ($pengurus->password === null) {
+            return response()->json([
+                'message' => 'Silakan daftar ulang terlebih dahulu'
+            ], 403);
+        }
+
+        if ($pengurus->status_akun !== 'Aktif') {
+            return response()->json([
+                'message' => 'Akun tidak aktif'
+            ], 403);
+        }
+
+        if (!Hash::check($request->password, $pengurus->password)) {
+            return response()->json([
+                'message' => 'Password salah'
+            ], 422);
+        }
+
+        $token = $pengurus->createToken('pengurus_token')->plainTextToken;
+
         return response()->json([
-            'message' => 'Anda belum melakukan daftar ulang. Silakan lengkapi data Anda terlebih dahulu.'
-        ], 403);
+            'message' => 'Login pengurus berhasil',
+            'token' => $token,
+        ]);
     }
-
-
-    if (!Hash::check($request->password, $pengurus->password)) {
-        return response()->json(['message' => 'Password salah'], 401);
-    }
-
-    if ($pengurus->status_akun !== 'Aktif') {
-        return response()->json([
-            'message' => 'Akun Anda sedang dalam status ' . $pengurus->status_akun . '. Silakan hubungi admin untuk aktivasi.'
-        ], 403);
-    }
-
-    $token = $pengurus->createToken('pengurus_token')->plainTextToken;
 
     return response()->json([
-        'token'   => $token,
-    ], 200);
+        'message' => 'Mohon isi nomor'
+    ], 422);
 }
+
 public function daftarUlangPengurus(Request $request)
 {
     $pengurus = Pengurus::where('nomor_pengurus', $request->nomor_pengurus)->first();
@@ -123,35 +121,6 @@ public function daftarUlangPengurus(Request $request)
     $pengurus->save();
 
     return response()->json(['message' => 'Daftar ulang berhasil. Menunggu verifikasi admin.'], 200);
-}
-
-public function daftarUlangNasabah(Request $request)
-{
-    $request->validate([
-        'nomor_nasabah' => 'required|exists:nasabah,nomor_nasabah',
-        'password' => 'required|min:6|confirmed',
-    ]);
-
-    $nasabah = Nasabah::where('nomor_nasabah', $request->nomor_nasabah)->first();
-
-    if (!$nasabah) {
-        return response()->json([
-            'message' => 'Nasabah tidak ditemukan'
-        ], 404);
-    }
-
-    if ($nasabah->password !== null) {
-        return response()->json([
-            'message' => 'Akun anda sudah pernah daftar ulang'
-        ], 422);
-    }
-
-    $nasabah->password = Hash::make($request->password);
-    $nasabah->save();
-
-    return response()->json([
-        'message' => 'Daftar ulang berhasil, silakan login'
-    ], 200);
 }
 
 public function loginNasabah(Request $request)
@@ -192,4 +161,56 @@ public function loginNasabah(Request $request)
         'token' => $token
     ], 200);
 }
+
+public function logout(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user) {
+            $user->currentAccessToken()->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Logout berhasil. Sesi untuk ' . class_basename($user) . ' telah diakhiri.'
+            ], 200);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Gagal logout, token tidak valid atau sudah tidak aktif.'
+        ], 401);
+    }
+
+public function daftarUlangNasabah(Request $request)
+{
+    $request->validate([
+        'nomor_nasabah' => 'required|exists:nasabah,nomor_nasabah',
+        'password' => 'required|min:6|confirmed',
+        'pin' => 'required|digits:6|confirmed',
+    ]);
+
+    $nasabah = Nasabah::where('nomor_nasabah', $request->nomor_nasabah)->first();
+
+    if (!$nasabah) {
+        return response()->json([
+            'message' => 'Nasabah tidak ditemukan'
+        ], 404);
+    }
+
+    if ($nasabah->password !== null) {
+        return response()->json([
+            'message' => 'Akun sudah aktif, silakan login'
+        ], 422);
+    }
+
+    $nasabah->password = Hash::make($request->password);
+    $nasabah->pin = $request->pin; 
+
+    $nasabah->save();
+
+    return response()->json([
+        'message' => 'Daftar ulang berhasil.'
+    ], 200);
+}
+
 }

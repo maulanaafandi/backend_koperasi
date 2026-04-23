@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\DashboardAdminController;
 use App\Http\Controllers\Admin\PengurusManagementController;
 use App\Http\Controllers\Admin\NasabahController;
+use App\Http\Controllers\Admin\TransaksiController;
 use App\Http\Controllers\Admin\JenisSimpananController;
 use App\Http\Controllers\Admin\LamaAngsuranController;
 use App\Http\Controllers\Admin\PinjamanController;
@@ -14,14 +15,16 @@ use App\Http\Controllers\Pengurus\NasabahManagementController;
 use App\Http\Controllers\Pengurus\TransaksiSimpananController;
 use App\Http\Controllers\Pengurus\TransaksiTarikController;
 use App\Http\Controllers\Pengurus\TransaksiPinjamanController;
+use App\Http\Controllers\Pengurus\TransaksiBayarPinjamanController;
 use App\Http\Controllers\Pengurus\PengumumanController;
-
+use App\Http\Controllers\Nasabah\DashboardNasabahController;
+use App\Http\Controllers\Nasabah\AktivitasTransaksiController;
+use App\Http\Controllers\Nasabah\ProfileSettingController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
-Route::post('/admin/login', [AuthController::class, 'loginAdmin']);
-Route::post('/pengurus/login', [AuthController::class, 'loginPengurus']);
+Route::post('/login', [AuthController::class, 'login']);
 Route::post('/nasabah/login', [AuthController::class, 'loginNasabah']);
 Route::post('/daftar-ulang-pengurus', [AuthController::class, 'daftarUlangPengurus']);
 Route::post('/daftar-ulang-nasabah', [AuthController::class, 'daftarUlangNasabah']);
@@ -49,6 +52,12 @@ Route::middleware(['auth:sanctum', 'is_admin'])->group(function () {
     Route::get('/admin/get-lama-angsuran/{id}', [LamaAngsuranController::class, 'getById']);
     Route::patch('/admin/update-lama-angsuran/{id}', [LamaAngsuranController::class, 'update']);
     Route::delete('/admin/hapus-lama-angsuran/{id}', [LamaAngsuranController::class, 'destroy']);
+
+    Route::get('/admin/nasabah', [NasabahController::class, 'indexNasabah']);
+    Route::get('/admin/detail-nasabah/{id}', [NasabahController::class, 'detailNasabah']);
+
+    Route::get('/admin/transaksi', [TransaksiController::class, 'getTransaksi']);
+    Route::get('/admin/deatail-transaksi', [TransaksiController::class, 'detailTransaksi']);
 
     Route::get('/admin/pinjaman-pengajuan', [PinjamanController::class, 'pengajuan']);
     Route::get('/admin/detail-pinjaman-pengajuan/{id}', [PinjamanController::class, 'detailPengajuan']);
@@ -83,6 +92,10 @@ Route::middleware(['auth:sanctum', 'is_pengurus'])->group(function () {
     Route::post('/pengurus/buat-transaksi-pinjam', [TransaksiPinjamanController::class, 'store']);
     Route::patch('/pengurus/update-transaksi-pinjam/{id}', [TransaksiPinjamanController::class, 'approve']);
 
+    Route::get('/pengurus/transaksi-bayar-pinjaman', [TransaksiBayarPinjamanController::class, 'getBayarPinjaman']);
+    Route::get('/pengurus/detail-transaksi-bayar-pinjaman/{id}', [TransaksiBayarPinjamanController::class, 'detailBayarPinjaman']);
+    Route::post('/pengurus/buat-transaksi-bayar-pinjaman', [TransaksiBayarPinjamanController::class, 'bayarCicilan']);
+
     Route::get('/pengurus/pengumuman', [PengumumanController::class, 'index']);
     Route::get('/pengurus/get-pengumuman/{id}', [PengumumanController::class, 'show']);
     Route::get('/pengurus/detail-pengumuman/{id}', [PengumumanController::class, 'detailpengumuman']);
@@ -93,6 +106,15 @@ Route::middleware(['auth:sanctum', 'is_pengurus'])->group(function () {
 });
 
 Route::middleware(['auth:sanctum', 'is_nasabah'])->group(function () {
+    Route::get('/nasabah/dashboard', [DashboardNasabahController::class, 'dashboardNasabah']);
 
+    Route::get('/nasabah/aktivitas-transaksi', [AktivitasTransaksiController::class, 'aktivitasTransaksiNasabah']);
+    Route::get('/nasabah/detail-aktivitas-transaksi', [AktivitasTransaksiController::class, 'detailAktivitasTransaksi']);
+
+    Route::get('/nasabah/profil-akun', [ProfileSettingController::class, 'profileNasabah']);
+    Route::get('/nasabah/get-profil-akun', [ProfileSettingController::class, 'getNasabahById']);
+    Route::patch('/nasabah/update-profil', [ProfileSettingController::class, 'updateProfileNasabah']);
+    Route::patch('/nasabah/update-pin', [ProfileSettingController::class, 'updatePinNasabah']);
+    Route::patch('/nasabah/update-password', [ProfileSettingController::class, 'updatePasswordNasabah']);
 });
 

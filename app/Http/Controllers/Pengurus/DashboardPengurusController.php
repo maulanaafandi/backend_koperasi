@@ -15,13 +15,13 @@ class DashboardPengurusController extends Controller
         return response()->json([
             'total_akun_nasabah' => Nasabah::count(),
 
-            // 'total_pinjaman' => Pinjaman::count(),
+            'total_pinjaman' => Pinjaman::count(),
 
-            // 'total_pinjaman_lunas' => Pinjaman::where('status_angsuran', 'lunas')->count(),
+            'total_pinjaman_lunas' => Pinjaman::where('status_angsuran', 'lunas')->count(),
 
-            // 'total_pinjaman_jatuh_tempo' => Pinjaman::where('status_angsuran', 'jatuh_tempo')->count(),
+            'total_pinjaman_jatuh_tempo' => Pinjaman::where('status_angsuran', 'jatuh_tempo')->count(),
 
-            // 'total_pinjaman_macet' => Pinjaman::where('status_angsuran', 'macet')->count(),
+            'total_pinjaman_macet' => Pinjaman::where('status_angsuran', 'macet')->count(),
         ]);
     }
 }

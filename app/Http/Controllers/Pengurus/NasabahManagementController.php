@@ -106,7 +106,7 @@ public function getStatus($id)
         'jenis_pekerjaan' => 'required|string|max:100',
         'gaji_pekerjaan' => 'required|numeric|min:0',
         'nama_ibu_kandung' => 'required|string',
-        'foto_profil' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        'foto_profil' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         'tipe' => ['required', Rule::in(['Non-Anggota', 'Anggota'])],
     ]);
 
@@ -119,10 +119,9 @@ public function getStatus($id)
 
     $pengurusLogin = optional(auth()->user())->nomor_pengurus ?? 'PGR000';
 
-    $pathFoto = null;
-    if ($request->hasFile('foto_profil')) {
-        $pathFoto = $request->file('foto_profil')->store('nasabah/foto_profil', 'public');
-    }
+    $pathFoto = $request->file('foto_profil')
+        ->store('nasabah/foto_profil', 'public');
+
 
     $nasabah = new Nasabah();
     $nasabah->nomor_nasabah = $nomorNasabah;

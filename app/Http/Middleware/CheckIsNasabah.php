@@ -11,7 +11,7 @@ class CheckIsNasabah
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (!$request->user() instanceof Nasabah || $request->user()->status_akun !== 'Aktif') {
+        if (!$request->user() instanceof Nasabah || $request->user()->status !== 'Aktif') {
             return response()->json([
                 'message' => 'Access denied. Fitur ini hanya untuk Nasabah dengan akun aktif.'
             ], 403);

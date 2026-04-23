@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Pengurus;
 use App\Models\Nasabah;
-//use App\Models\Pinjaman;
+use App\Models\Pinjaman;
 
 class DashboardAdminController extends Controller
 {
@@ -19,9 +19,9 @@ class DashboardAdminController extends Controller
 
             'total_nasabah' => Nasabah::count(),
 
-   //         'total_pinjaman' => Pinjaman::count(),
+           'total_pinjaman' => Pinjaman::count(),
 
-  //          'total_pinjaman_macet' => Pinjaman::where('status', 'macet')->count(),
+           'total_pinjaman_macet' => Pinjaman::where('status', 'macet')->count(),
         ]);
     }
 }

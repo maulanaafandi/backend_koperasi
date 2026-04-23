@@ -114,6 +114,7 @@ Route::middleware(['auth:sanctum', 'is_nasabah'])->group(function () {
     Route::get('/nasabah/profil-akun', [ProfileSettingController::class, 'profileNasabah']);
     Route::get('/nasabah/get-profil-akun', [ProfileSettingController::class, 'getNasabahById']);
     Route::patch('/nasabah/update-profil', [ProfileSettingController::class, 'updateProfileNasabah']);
+    Route::post('/nasabah/update-foto-profil', [ProfileSettingController::class, 'updateFotoProfil']);
     Route::patch('/nasabah/update-pin', [ProfileSettingController::class, 'updatePinNasabah']);
     Route::patch('/nasabah/update-password', [ProfileSettingController::class, 'updatePasswordNasabah']);
 });

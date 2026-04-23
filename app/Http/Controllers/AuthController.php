@@ -35,8 +35,7 @@ class AuthController extends Controller
             return response()->json([
                 'message' => 'Password salah'
             ], 422);
-        }
-
+        }        
         $token = $admin->createToken('admin_token')->plainTextToken;
 
         return response()->json([
@@ -74,7 +73,6 @@ class AuthController extends Controller
         $token = $pengurus->createToken('pengurus_token')->plainTextToken;
 
         return response()->json([
-            'message' => 'Login pengurus berhasil',
             'token' => $token,
         ]);
     }

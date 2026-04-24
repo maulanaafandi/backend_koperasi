@@ -77,46 +77,38 @@ public function update(Request $request, $id)
     $pengumuman = Pengumuman::findOrFail($id);
 
     $request->validate([
-        'judul' => 'required',
-        'deskripsi' => 'required',
+        'judul'     => 'nullable|string',
+        'deskripsi' => 'nullable|string',
+        'foto'      => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
     ]);
 
     $pengurusLogin = auth()->user()?->nomor_pengurus ?? 'PGR000';
 
-    $pengumuman->update([
-        'judul' => $request->judul,
-        'deskripsi' => $request->deskripsi,
-        'diubah_oleh' => $pengurusLogin,
-    ]);
+    if ($request->hasFile('foto')) {
 
-    return response()->json([
-        'message' => 'Berhasil update pengumuman',
-    ]);
-}
+        if ($pengumuman->foto && Storage::disk('public')->exists($pengumuman->foto)) {
+            Storage::disk('public')->delete($pengumuman->foto);
+        }
 
-public function updateFoto(Request $request, $id)
-{
-    $pengumuman = Pengumuman::findOrFail($id);
-
-    $request->validate([
-        'foto' => 'required|image'
-    ]);
-
-    if ($pengumuman->foto) {
-        Storage::disk('public')->delete($pengumuman->foto);
+        $fotoPath = $request->file('foto')->store('pengumuman', 'public');
+        $pengumuman->foto = $fotoPath;
     }
 
-    $fotoPath = $request->file('foto')->store('pengumuman', 'public');
-    $pengurusLogin = auth()->user()?->nomor_pengurus ?? 'PGR000';
+    if ($request->filled('judul')) {
+        $pengumuman->judul = $request->judul;
+    }
 
-    $pengumuman->update([
-        'foto' => $fotoPath,
-        'diubah_oleh' => $pengurusLogin,
-    ]);
+    if ($request->filled('deskripsi')) {
+        $pengumuman->deskripsi = $request->deskripsi;
+    }
+
+    $pengumuman->diubah_oleh = $pengurusLogin;
+
+    $pengumuman->save();
 
     return response()->json([
-        'message' => 'Foto pengumuman berhasil diupdate',
-    ]);
+        'message' => 'Pengumuman berhasil diupdate',
+    ], 200);
 }
 
 public function destroy($id)

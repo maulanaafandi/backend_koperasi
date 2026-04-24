@@ -19,6 +19,8 @@ use App\Http\Controllers\Pengurus\TransaksiBayarPinjamanController;
 use App\Http\Controllers\Pengurus\PengumumanController;
 use App\Http\Controllers\Nasabah\DashboardNasabahController;
 use App\Http\Controllers\Nasabah\AktivitasTransaksiController;
+use App\Http\Controllers\Nasabah\BayarPinjamanController;
+use App\Http\Controllers\Nasabah\InboxController;
 use App\Http\Controllers\Nasabah\ProfileSettingController;
 
 Route::get('/user', function (Request $request) {
@@ -101,7 +103,6 @@ Route::middleware(['auth:sanctum', 'is_pengurus'])->group(function () {
     Route::get('/pengurus/detail-pengumuman/{id}', [PengumumanController::class, 'detailpengumuman']);
     Route::post('/pengurus/buat-pengumuman', [PengumumanController::class, 'store']);
     Route::patch('/pengurus/update-pengumuman/{id}', [PengumumanController::class, 'update']);
-    Route::post('/pengurus/update-foto-pengumuman/{id}', [PengumumanController::class, 'updateFoto']);
     Route::delete('/pengurus/hapus-pengumuman/{id}', [PengumumanController::class, 'destroy']);
 });
 
@@ -111,10 +112,16 @@ Route::middleware(['auth:sanctum', 'is_nasabah'])->group(function () {
     Route::get('/nasabah/aktivitas-transaksi', [AktivitasTransaksiController::class, 'aktivitasTransaksiNasabah']);
     Route::get('/nasabah/detail-aktivitas-transaksi', [AktivitasTransaksiController::class, 'detailAktivitasTransaksi']);
 
+    Route::post('/nasabah/bayar-cicilan-pinjaman/{id}', [BayarPinjamanController::class, ' bayarCicilanNasabah']);
+    Route::get('/nasabah/bayar-pinjaman', [BayarPinjamanController::class, 'getPinjamanNasabah']);
+    Route::get('/nasabah/detail-bayar-pinjaman/{id}', [BayarPinjamanController::class, 'getDetailPinjamanNasabah']);
+
+    Route::get('/nasabah/inbox', [InboxController::class, 'getInbox']);
+    Route::get('/nasabah/inbox/{id}', [InboxController::class, 'getDetailInbox']);
+
     Route::get('/nasabah/profil-akun', [ProfileSettingController::class, 'profileNasabah']);
     Route::get('/nasabah/get-profil-akun', [ProfileSettingController::class, 'getNasabahById']);
     Route::patch('/nasabah/update-profil', [ProfileSettingController::class, 'updateProfileNasabah']);
-    Route::post('/nasabah/update-foto-profil', [ProfileSettingController::class, 'updateFotoProfil']);
     Route::patch('/nasabah/update-pin', [ProfileSettingController::class, 'updatePinNasabah']);
     Route::patch('/nasabah/update-password', [ProfileSettingController::class, 'updatePasswordNasabah']);
 });

@@ -46,49 +46,38 @@ class ProfileSettingController extends Controller
         }
 
         $request->validate([
-            'nama_lengkap' => 'nullable|string|max:255',
-            'nomor_handphone' => 'nullable|string|max:15|unique:nasabah,nomor_handphone,' . $nasabah->id,
-            'email' => 'nullable|email|unique:nasabah,email,' . $nasabah->id,
+            'nama_lengkap'      => 'nullable|string|max:255',
+            'nomor_handphone'   => 'nullable|string|max:15|unique:nasabah,nomor_handphone,' . $nasabah->id,
+            'email'             => 'nullable|email|unique:nasabah,email,' . $nasabah->id,
+            'foto_profil'       => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $nasabah->nama_lengkap = $request->input('nama_lengkap', $nasabah->nama_lengkap);
         $nasabah->nomor_handphone = $request->input('nomor_handphone', $nasabah->nomor_handphone);
         $nasabah->email = $request->input('email', $nasabah->email);
 
-        $nasabah->save();
+        if ($request->hasFile('foto_profil')) {
 
-        return response()->json([
-            'message' => 'Profil berhasil diperbarui',
-        ], 200);
-    }
+            if ($nasabah->foto_profil && Storage::disk('public')->exists($nasabah->foto_profil)) {
+                Storage::disk('public')->delete($nasabah->foto_profil);
+            }
 
-    public function updateFotoProfil(Request $request)
-    {
-        $nasabah = auth()->user();
+            $path = $request->file('foto_profil')
+                            ->store('nasabah/foto_profil', 'public');
 
-        if (!$nasabah) {
-            return response()->json([
-                'message' => 'Nasabah tidak ditemukan'
-            ], 404);
+            $nasabah->foto_profil = $path;
         }
 
-        $request->validate([
-            'foto_profil' => 'required|image|mimes:jpg,jpeg,png|max:2048'
-        ]);
-
-        if (!empty($nasabah->foto_profil) && Storage::disk('public')->exists($nasabah->foto_profil)) {
-            Storage::disk('public')->delete($nasabah->foto_profil);
-        }
-
-        $path = $request->file('foto_profil')->store('nasabah/foto_profil', 'public');
-
-        $nasabah->foto_profil = $path;
         $nasabah->save();
 
+
         return response()->json([
-            'message' => 'Foto profil berhasil diperbarui',
+            'message' => 'Profile berhasil diperbarui',
             'data' => [
-                'foto_profil' => $nasabah->foto_profil_url
+                'nama_lengkap'    => $nasabah->nama_lengkap,
+                'foto_profil'     => $nasabah->foto_profil_url,
+                'nomor_handphone' => $nasabah->nomor_handphone,
+                'email'           => $nasabah->email,
             ]
         ], 200);
     }
@@ -191,51 +180,3 @@ class ProfileSettingController extends Controller
     }
 }
 
-// public function updateProfileNasabah(Request $request)
-// {
-//     $nasabah = auth()->user();
-
-//     if (!$nasabah) {
-//         return response()->json([
-//             'message' => 'Nasabah tidak ditemukan'
-//         ], 404);
-//     }
-
-//     $request->validate([
-//         'nama_lengkap'      => 'nullable|string|max:255',
-//         'nomor_handphone'   => 'nullable|string|max:15|unique:nasabah,nomor_handphone,' . $nasabah->id,
-//         'email'             => 'nullable|email|unique:nasabah,email,' . $nasabah->id,
-//         'foto_profil'       => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-//     ]);
-
-//     $nasabah->nama_lengkap = $request->input('nama_lengkap', $nasabah->nama_lengkap);
-//     $nasabah->nomor_handphone = $request->input('nomor_handphone', $nasabah->nomor_handphone);
-//     $nasabah->email = $request->input('email', $nasabah->email);
-
-//     if ($request->hasFile('foto_profil')) {
-
-//         // hapus foto lama
-//         if ($nasabah->foto_profil && Storage::disk('public')->exists($nasabah->foto_profil)) {
-//             Storage::disk('public')->delete($nasabah->foto_profil);
-//         }
-
-//         // upload foto baru
-//         $path = $request->file('foto_profil')
-//                         ->store('nasabah/foto_profil', 'public');
-
-//         $nasabah->foto_profil = $path;
-//     }
-
-//     $nasabah->save();
-
-
-//     return response()->json([
-//         'message' => 'Profile berhasil diperbarui',
-//         'data' => [
-//             'nama_lengkap'    => $nasabah->nama_lengkap,
-//             'foto_profil'     => $nasabah->foto_profil_url,
-//             'nomor_handphone' => $nasabah->nomor_handphone,
-//             'email'           => $nasabah->email,
-//         ]
-//     ], 200);
-// }

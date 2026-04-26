@@ -21,6 +21,7 @@ use App\Http\Controllers\Nasabah\DashboardNasabahController;
 use App\Http\Controllers\Nasabah\AktivitasTransaksiController;
 use App\Http\Controllers\Nasabah\BayarPinjamanController;
 use App\Http\Controllers\Nasabah\InboxController;
+use App\Http\Controllers\Nasabah\JenisSimpananNasabahController;
 use App\Http\Controllers\Nasabah\ProfileSettingController;
 
 Route::get('/user', function (Request $request) {
@@ -118,6 +119,8 @@ Route::middleware(['auth:sanctum', 'is_nasabah'])->group(function () {
 
     Route::get('/nasabah/inbox', [InboxController::class, 'getInbox']);
     Route::get('/nasabah/inbox/{id}', [InboxController::class, 'getDetailInbox']);
+
+    Route::get('/nasabah/jenis-simpanan', [JenisSimpananNasabahController::class, 'getJenisSimpanan']);
 
     Route::get('/nasabah/profil-akun', [ProfileSettingController::class, 'profileNasabah']);
     Route::get('/nasabah/get-profil-akun', [ProfileSettingController::class, 'getNasabahById']);

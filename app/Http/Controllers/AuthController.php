@@ -12,75 +12,81 @@ use Illuminate\Validation\Rules\Password;
 
 class AuthController extends Controller
 {
-   public function login(Request $request)
-{
-    $request->validate([
-        'password' => 'required'
-    ]);
-
-    if ($request->filled('nomor_admin')) {
+ public function login(Request $request)
+    {
         $request->validate([
-            'nomor_admin' => 'exists:admin,nomor_admin'
+            'nomor' => 'required|string',
+            'password' => 'required|string',
         ]);
 
-        $admin = Admin::where('nomor_admin', $request->nomor_admin)->first();
+        $nomor = $request->input('nomor');
+        $password = $request->input('password');
 
-        if ($admin->password === null) {
+        $matches = [];
+
+        $admin = Admin::where('nomor_admin', $nomor)->first();
+        if ($admin) {
+            $matches[] = ['role' => 'admin', 'user' => $admin];
+        }
+
+        $pengurus = Pengurus::where('nomor_pengurus', $nomor)->first();
+        if ($pengurus) {
+            $matches[] = ['role' => 'pengurus', 'user' => $pengurus];
+        }
+
+        $nasabah = Nasabah::where('nomor_nasabah', $nomor)->first();
+        if ($nasabah) {
+            $matches[] = ['role' => 'nasabah', 'user' => $nasabah];
+        }
+
+        if (count($matches) === 0) {
             return response()->json([
-                'message' => 'Silakan daftar ulang terlebih dahulu'
+                'message' => 'Nomor tidak ditemukan',
+            ], 404);
+        }
+
+        if (count($matches) > 1) {
+            return response()->json([
+                'message' => 'Nomor terdeteksi di lebih dari satu akun. Hubungi admin untuk perbaikan data.',
+            ], 409);
+        }
+
+        $role = $matches[0]['role'];
+        $user = $matches[0]['user'];
+
+        if ($user->password === null) {
+            return response()->json([
+                'message' => 'Silakan daftar ulang terlebih dahulu',
             ], 403);
         }
 
-        if (!Hash::check($request->password, $admin->password)) {
+        if ($role === 'pengurus' && ($user->status_akun ?? null) !== 'Aktif') {
             return response()->json([
-                'message' => 'Password salah'
+                'message' => 'Akun tidak aktif',
+            ], 403);
+        }
+
+        if ($role === 'nasabah' && ($user->status ?? null) !== 'Aktif') {
+            return response()->json([
+                'message' => 'Akun tidak aktif',
+            ], 403);
+        }
+
+        if (!Hash::check($password, $user->password)) {
+            return response()->json([
+                'message' => 'Password salah',
             ], 422);
-        }        
-        $token = $admin->createToken('admin_token')->plainTextToken;
+        }
+
+        $tokenName = 'auth_token';
+        $abilities = ['role:' . $role];
+        $token = $user->createToken($tokenName, $abilities)->plainTextToken;
 
         return response()->json([
-            'message' => 'Login admin berhasil',
+            'role' => $role,
             'token' => $token,
-        ]);
+        ], 200);
     }
-
-    if ($request->filled('nomor_pengurus')) {
-
-        $request->validate([
-            'nomor_pengurus' => 'exists:pengurus,nomor_pengurus'
-        ]);
-
-        $pengurus = Pengurus::where('nomor_pengurus', $request->nomor_pengurus)->first();
-
-        if ($pengurus->password === null) {
-            return response()->json([
-                'message' => 'Silakan daftar ulang terlebih dahulu'
-            ], 403);
-        }
-
-        if ($pengurus->status_akun !== 'Aktif') {
-            return response()->json([
-                'message' => 'Akun tidak aktif'
-            ], 403);
-        }
-
-        if (!Hash::check($request->password, $pengurus->password)) {
-            return response()->json([
-                'message' => 'Password salah'
-            ], 422);
-        }
-
-        $token = $pengurus->createToken('pengurus_token')->plainTextToken;
-
-        return response()->json([
-            'token' => $token,
-        ]);
-    }
-
-    return response()->json([
-        'message' => 'Mohon isi nomor'
-    ], 422);
-}
 
 public function daftarUlangPengurus(Request $request)
 {
@@ -119,45 +125,6 @@ public function daftarUlangPengurus(Request $request)
     $pengurus->save();
 
     return response()->json(['message' => 'Daftar ulang berhasil. Menunggu verifikasi admin.'], 200);
-}
-
-public function loginNasabah(Request $request)
-{
-    $request->validate([
-        'nomor_nasabah' => 'required|exists:nasabah,nomor_nasabah',
-        'password' => 'required'
-    ]);
-
-    $nasabah = Nasabah::where('nomor_nasabah', $request->nomor_nasabah)->first();
-
-    if (!$nasabah) {
-        return response()->json([
-            'message' => 'Nasabah tidak ditemukan'
-        ], 404);
-    }
-
-    if ($nasabah->password === null) {
-        return response()->json([
-            'message' => 'Silakan daftar ulang terlebih dahulu'
-        ], 403);
-    }
-
-    if ($nasabah->status !== 'Aktif') {
-        return response()->json([
-            'message' => 'Akun tidak aktif'
-        ], 403);
-    }
-
-    if (!Hash::check($request->password, $nasabah->password)) {
-        return response()->json([
-            'message' => 'Password salah'
-        ], 422);
-    }
-
-    $token = $nasabah->createToken('nasabah_token')->plainTextToken;
-    return response()->json([
-        'token' => $token
-    ], 200);
 }
 
 public function logout(Request $request)

@@ -28,7 +28,7 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/nasabah/login', [AuthController::class, 'loginNasabah']);
+Route::post('/nasabah/login', [AuthController::class, 'login']);
 Route::post('/daftar-ulang-pengurus', [AuthController::class, 'daftarUlangPengurus']);
 Route::post('/daftar-ulang-nasabah', [AuthController::class, 'daftarUlangNasabah']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);

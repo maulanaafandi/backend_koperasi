@@ -61,7 +61,7 @@ Route::middleware(['auth:sanctum', 'is_admin'])->group(function () {
     Route::get('/admin/detail-nasabah/{id}', [NasabahController::class, 'detailNasabah']);
 
     Route::get('/admin/transaksi', [TransaksiController::class, 'getTransaksi']);
-    Route::get('/admin/deatail-transaksi', [TransaksiController::class, 'detailTransaksi']);
+    Route::get('/admin/detail-transaksi/{id}', [TransaksiController::class, 'detailTransaksi']);
 
     Route::get('/admin/pinjaman-pengajuan', [PinjamanController::class, 'pengajuan']);
     Route::get('/admin/detail-pinjaman-pengajuan/{id}', [PinjamanController::class, 'detailPengajuan']);

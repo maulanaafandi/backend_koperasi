@@ -16,7 +16,7 @@ class InboxController extends Controller
             'data' => $data->map(function ($item) {
                 return [
                     'judul'     => $item->judul,
-                    'foto'      => $item->foto_url,
+                    'foto'      => $item->foto,
                     'deskripsi' => $item->deskripsi,
                 ];
             })
@@ -36,7 +36,7 @@ class InboxController extends Controller
         return response()->json([
             'data' => [
                 'judul'         => $item->judul,
-                'foto'          => $item->foto_url,
+                'foto'          => $item->foto,
                 'deskripsi'     => $item->deskripsi,
                 'waktu_dibuat'  => $item->created_at,
                 'dibuat_oleh'   => $item->dibuat_oleh,

@@ -23,7 +23,7 @@ class ProfileSettingController extends Controller
         return response()->json([
             'data' => [
                 'nama_lengkap' => $nasabah->nama_lengkap,
-                'foto_profil' => $nasabah->foto_profil_url,
+                'foto_profil' => $nasabah->foto_profil,
                 'nomor_nasabah' => $nasabah->nomor_nasabah,
                 'nomor_handphone' => $nasabah->nomor_handphone,
                 'email' => $nasabah->email,
@@ -168,7 +168,7 @@ class ProfileSettingController extends Controller
             'message' => 'Detail nasabah',
             'data' => [
                 'nama_lengkap' => $nasabah->nama_lengkap,
-                'foto_profil' => $nasabah->foto_profil_url,
+                'foto_profil' => $nasabah->foto_profil,
                 'nomor_handphone' => $nasabah->nomor_handphone,
                 'email' => $nasabah->email,
             ]

@@ -26,12 +26,5 @@ class Pengumuman extends Model
             $model->waktu_diubah = null;
         });
     }
-
-    public function getFotoUrlAttribute()
-    {
-        return $this->foto
-            ? asset('storage/' . $this->foto)
-            : null;
-    }
     
 }

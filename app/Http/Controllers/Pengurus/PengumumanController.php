@@ -18,7 +18,7 @@ public function index()
             return [
                 'id' => $item->id,
                 'judul' => $item->judul,
-                'foto' => $item->foto_url,
+                'foto' => $item->foto,
                 'deskripsi' => $item->deskripsi,
                 'dibuat_oleh' => $item->dibuat_oleh,
             ];
@@ -32,7 +32,7 @@ public function show($id)
 
     return response()->json([
         'judul' => $pengumuman->judul,
-        'foto' => $pengumuman->foto_url,
+        'foto' => $pengumuman->foto,
         'deskripsi' => $pengumuman->deskripsi,
     ]);
 }

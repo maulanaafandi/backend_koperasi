@@ -79,6 +79,7 @@ Route::middleware(['auth:sanctum', 'is_pengurus'])->group(function () {
     Route::get('/pengurus/dashboard', [DashboardPengurusController::class, 'index']);
     Route::get('/pengurus/nama', [DashboardPengurusController::class, 'getNamaPengurus']);
     Route::get('/pengurus/nasabah', [NasabahManagementController::class, 'index']);
+    Route::get('/pengurus/jenis-simpanan-nasabah/{id}', [NasabahManagementController::class, 'getJenisSimpananById']);
     Route::get('/pengurus/detail-akun-nasabah/{id}', [NasabahManagementController::class, 'show']);
     Route::get('/pengurus/get-status-akun-nasabah/{id}', [NasabahManagementController::class, 'getStatus']);
     Route::post('/pengurus/buat-nasabah', [NasabahManagementController::class, 'store']);

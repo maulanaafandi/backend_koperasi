@@ -231,4 +231,23 @@ public function resetPassword($id)
         'message' => "Password nasabah {$nasabah->nama_lengkap} berhasil direset."
     ], 200);
 }
+
+    public function getJenisSimpananById($id)
+    {
+        $jenisSimpanan = JenisSimpanan::where('id', $id)->first();
+
+        if (!$jenisSimpanan) {
+            return response()->json([
+                'message' => 'Jenis simpanan tidak ditemukan'
+            ], 404);
+        }
+
+        return response()->json([
+            'data' => [
+                'id_jenis_simpanan' => $jenisSimpanan->id,
+                'nama_simpanan' => $jenisSimpanan->nama_simpanan,
+                'saldo_minimal' => $jenisSimpanan->saldo_minimal,
+            ]
+        ], 200);
+    }
 }

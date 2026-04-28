@@ -24,4 +24,19 @@ class DashboardPengurusController extends Controller
             'total_pinjaman_macet' => CicilanPinjaman::where('status_angsuran', 'macet')->count(),
         ]);
     }
+
+    public function getNamaPengurus()
+    {
+        $pengurus = auth()->user();
+
+        if (!$pengurus) {
+            return response()->json([
+                'message' => 'Pengurus tidak ditemukan'
+            ], 404);
+        }
+
+        return response()->json([
+                'nama_pengurus' => $pengurus->nama_lengkap
+        ], 200);
+    }
 }

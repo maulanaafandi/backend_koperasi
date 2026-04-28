@@ -37,6 +37,7 @@ class PinjamanController extends Controller
         'message' => 'List pengajuan',
         'data' => $data->map(function ($item) {
             return [
+                'id' => $item->id,
                 'nama_lengkap' => $item->nasabah->nama_lengkap,
                 'nomor_nasabah' => $item->nasabah->nomor_nasabah,
                 'jumlah_pinjaman' => $item->jumlah_pinjaman,

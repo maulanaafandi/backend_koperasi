@@ -36,6 +36,13 @@ class Pinjaman extends Model
         'waktu_tidak_setujui' => 'datetime',
     ];
 
+    public function getFotoJaminanUrlAttribute()
+    {
+        return $this->foto_jaminan
+            ? asset('storage/' . $this->foto_jaminan)
+            : null;
+    }
+
     public function nasabah() {
         return $this->belongsTo(Nasabah::class, 'id_nasabah');
     }

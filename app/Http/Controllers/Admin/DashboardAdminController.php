@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Pengurus;
 use App\Models\Nasabah;
 use App\Models\Pinjaman;
+use App\Models\CicilanPinjaman;
 
 class DashboardAdminController extends Controller
 {
@@ -21,7 +22,22 @@ class DashboardAdminController extends Controller
 
            'total_pinjaman' => Pinjaman::count(),
 
-           'total_pinjaman_macet' => Pinjaman::where('status', 'macet')->count(),
+           'total_pinjaman_macet' => CicilanPinjaman::where('status_angsuran', 'macet')->count(),
         ]);
     }
+
+    public function getNamaAdmin()
+{
+    $admin = auth()->user();
+
+    if (!$admin) {
+        return response()->json([
+            'message' => 'Admin tidak ditemukan'
+        ], 404);
+    }
+
+    return response()->json([
+            'nomor_admin' => $admin->nomor_admin
+    ], 200);
+}
 }

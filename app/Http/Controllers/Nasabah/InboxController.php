@@ -10,13 +10,13 @@ class InboxController extends Controller
 {
     public function getInbox()
     {
-        $data = Pengumuman::latest('created_at')->get();
+        $data = Pengumuman::latest('waktu_dibuat')->get();
 
         return response()->json([
             'data' => $data->map(function ($item) {
                 return [
                     'judul'     => $item->judul,
-                    'foto'      => $item->foto,
+                    'foto'      => $item->foto_url,
                     'deskripsi' => $item->deskripsi,
                 ];
             })
@@ -36,7 +36,7 @@ class InboxController extends Controller
         return response()->json([
             'data' => [
                 'judul'         => $item->judul,
-                'foto'          => $item->foto,
+                'foto'          => $item->foto_url,
                 'deskripsi'     => $item->deskripsi,
                 'waktu_dibuat'  => $item->created_at,
                 'dibuat_oleh'   => $item->dibuat_oleh,

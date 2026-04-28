@@ -61,6 +61,13 @@ class Nasabah extends Authenticatable
         'waktu_dinonaktifkan' => 'datetime',
     ];
 
+    public function getFotoProfilUrlAttribute()
+    {
+        return $this->foto_profil
+            ? asset('storage/' . $this->foto_profil)
+            : null;
+    }
+    
     protected function setPinAttribute($value)
     {
         $this->attributes['pin'] = $value ? Hash::make($value) : null;

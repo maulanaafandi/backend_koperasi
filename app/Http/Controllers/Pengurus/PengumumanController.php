@@ -11,9 +11,19 @@ class PengumumanController extends Controller
 {
 public function index()
 {
-    $pengumuman = Pengumuman::select('id','judul','deskripsi','dibuat_oleh')->latest('waktu_dibuat')->get();
+    $pengumuman = Pengumuman::latest('waktu_dibuat')->get();
 
-    return response()->json($pengumuman);
+    return response()->json(
+        $pengumuman->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'judul' => $item->judul,
+                'foto' => $item->foto_url,
+                'deskripsi' => $item->deskripsi,
+                'dibuat_oleh' => $item->dibuat_oleh,
+            ];
+        })
+    );
 }
 
 public function show($id)
@@ -22,7 +32,7 @@ public function show($id)
 
     return response()->json([
         'judul' => $pengumuman->judul,
-        'foto' => $pengumuman->foto,
+        'foto' => $pengumuman->foto_url,
         'deskripsi' => $pengumuman->deskripsi,
     ]);
 }

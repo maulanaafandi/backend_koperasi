@@ -23,9 +23,7 @@ class ProfileSettingController extends Controller
         return response()->json([
             'data' => [
                 'nama_lengkap' => $nasabah->nama_lengkap,
-                'foto_profil' => $nasabah->foto_profil 
-                    ? asset('storage/' . $nasabah->foto_profil) 
-                    : null,
+                'foto_profil' => $nasabah->foto_profil_url,
                 'nomor_nasabah' => $nasabah->nomor_nasabah,
                 'nomor_handphone' => $nasabah->nomor_handphone,
                 'email' => $nasabah->email,
@@ -170,7 +168,7 @@ class ProfileSettingController extends Controller
             'message' => 'Detail nasabah',
             'data' => [
                 'nama_lengkap' => $nasabah->nama_lengkap,
-                'foto_profil' => $nasabah->foto_profil,
+                'foto_profil' => $nasabah->foto_profil_url,
                 'nomor_handphone' => $nasabah->nomor_handphone,
                 'email' => $nasabah->email,
             ]

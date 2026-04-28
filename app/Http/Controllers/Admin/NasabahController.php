@@ -46,7 +46,7 @@ public function detailNasabah($id)
         'message' => 'Detail nasabah',
         'data' => [
             'nama_lengkap' => $nasabah->nama_lengkap,
-            'foto_profil' => $nasabah->foto_profil,
+            'foto_profil' => $nasabah->foto_profil_url,
             'nomor_induk_kependudukan' => $nasabah->nomor_induk_kependudukan,
             'nama_ibu_kandung' => $nasabah->nama_ibu_kandung,
             'tanggal_lahir' => $nasabah->tanggal_lahir,

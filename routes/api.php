@@ -35,6 +35,7 @@ Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logo
 
 Route::middleware(['auth:sanctum', 'is_admin'])->group(function () {
     Route::get('/admin/dashboard', [DashboardAdminController::class, 'admin']);
+    Route::get('/admin/nomor', [DashboardAdminController::class, 'getNamaAdmin']);
     Route::get('/admin/pengurus', [PengurusManagementController::class, 'index']);
     Route::get('/admin/get-nasabah', [NasabahController::class, 'indexNasabah']);
     Route::get('/admin/detail-nasabah/{id}', [NasabahController::class, 'detailNasabah']);
@@ -75,6 +76,7 @@ Route::middleware(['auth:sanctum', 'is_admin'])->group(function () {
 
 Route::middleware(['auth:sanctum', 'is_pengurus'])->group(function () {
     Route::get('/pengurus/dashboard', [DashboardPengurusController::class, 'index']);
+    Route::get('/pengurus/nama', [DashboardPengurusController::class, 'getNamaPengurus']);
     Route::get('/pengurus/nasabah', [NasabahManagementController::class, 'index']);
     Route::get('/pengurus/detail-akun-nasabah/{id}', [NasabahManagementController::class, 'show']);
     Route::get('/pengurus/get-status-akun-nasabah/{id}', [NasabahManagementController::class, 'getStatus']);

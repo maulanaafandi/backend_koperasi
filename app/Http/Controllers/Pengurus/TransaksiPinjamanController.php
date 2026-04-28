@@ -154,6 +154,12 @@ public function approve($id)
 
     $pengurusLogin = optional(auth()->user())->nomor_pengurus ?? 'PGR000';
 
+    if ($pinjaman->dibuat_oleh === $pengurusLogin) {
+        return response()->json([
+            'message' => 'Tidak dapat menyetujui pinjaman yang dibuat sendiri'
+        ], 403);
+    }
+
     try {
         return DB::transaction(function () use ($pinjaman, $pengurusLogin) {
 

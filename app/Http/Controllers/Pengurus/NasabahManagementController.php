@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Pengurus;
 
 use App\Http\Controllers\Controller;
 use App\Models\Nasabah;
-use App\Models\JeniSimpanan;
+use App\Models\JenisSimpanan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;

@@ -64,9 +64,7 @@ public function detailPengajuan($id)
             'jumlah_pinjaman' => $item->jumlah_pinjaman,
             'status' => $item->status, 
             'jaminan' => $item->jaminan,
-            'foto_jaminan' => $item->foto_jaminan 
-                ? asset('storage/' . $item->foto_jaminan)
-                : null,
+            'foto_jaminan' => $item->foto_jaminan,
             'nilai_jaminan' => $item->nilai_jaminan,
             'waktu_dibuat' => $item->waktu_dibuat,
             'dibuat_oleh' => $item->dibuat_oleh,

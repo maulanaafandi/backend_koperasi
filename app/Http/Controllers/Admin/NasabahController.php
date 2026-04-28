@@ -46,9 +46,7 @@ public function detailNasabah($id)
         'message' => 'Detail nasabah',
         'data' => [
             'nama_lengkap' => $nasabah->nama_lengkap,
-            'foto_profil' => $nasabah->foto_profil 
-                ? asset('storage/' . $nasabah->foto_profil) 
-                : null,
+            'foto_profil' => $nasabah->foto_profil,
             'nomor_induk_kependudukan' => $nasabah->nomor_induk_kependudukan,
             'nama_ibu_kandung' => $nasabah->nama_ibu_kandung,
             'tanggal_lahir' => $nasabah->tanggal_lahir,

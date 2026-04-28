@@ -22,9 +22,7 @@ public function show($id)
 
     return response()->json([
         'judul' => $pengumuman->judul,
-        'foto' => $pengumuman->foto 
-            ? asset('storage/' . $pengumuman->foto) 
-            : null,
+        'foto' => $pengumuman->foto,
         'deskripsi' => $pengumuman->deskripsi,
     ]);
 }

@@ -170,9 +170,7 @@ class ProfileSettingController extends Controller
             'message' => 'Detail nasabah',
             'data' => [
                 'nama_lengkap' => $nasabah->nama_lengkap,
-                'foto_profil' => $nasabah->foto_profil 
-                    ? asset('storage/' . $nasabah->foto_profil) 
-                    : null,
+                'foto_profil' => $nasabah->foto_profil,
                 'nomor_handphone' => $nasabah->nomor_handphone,
                 'email' => $nasabah->email,
             ]

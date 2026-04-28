@@ -24,6 +24,7 @@ public function index()
         'message' => 'Daftar Pinjaman Berhasil Dimuat',
         'data' => $data->map(function ($item) {
             return [
+                'id' => $item->id,
                 'nama_lengkap' => optional($item->nasabah)->nama_lengkap,
                 'nomor_rekening' => optional($item->nasabah)->nomor_rekening,
                 'lama_angsuran'  => optional($item->tenor)->lama_angsuran,
@@ -126,13 +127,6 @@ public function store(Request $request)
 
     return response()->json([
         'message' => 'Pengajuan pinjaman berhasil dibuat',
-        'data' => [
-            'id' => $pinjaman->id,
-            'nama_nasabah' => $nasabah->nama_lengkap,
-            'tipe_nasabah' => $nasabah->tipe,
-            'jumlah_pinjaman' => $pinjaman->jumlah_pinjaman,
-            'status' => $pinjaman->status
-        ]
     ], 201);
 }
 

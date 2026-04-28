@@ -138,6 +138,7 @@ class BayarPinjamanController extends Controller
             'message' => 'Data pinjaman',
             'data' => $pinjaman->map(function ($item) {
                 return [
+                    'id'               => $item->id,
                     // 'jumlah_pinjaman' => $item->total_pinjaman,
                     'lama_angsuran'   => $item->tenor->lama_angsuran ?? null,
                     'waktu_disetujui' => $item->waktu_disetujui,

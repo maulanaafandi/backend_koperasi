@@ -15,6 +15,7 @@ class JenisSimpananController extends Controller
     $jenisSimpanan = JenisSimpanan::all();
     $data = $jenisSimpanan->map(function ($item) {
         return [
+            'id' => $item->id,
             'nama_simpanan' => $item->nama_simpanan,
             'saldo_minimal' => $item->saldo_minimal,
         ];
@@ -76,6 +77,7 @@ public function show($id)
     }
 
     return response()->json([
+        'id'            => $jenis->id,
         'nama_simpanan' => $jenis->nama_simpanan,
         'saldo_minimal' => $jenis->saldo_minimal,
         'waktu_dibuat'  => $jenis->waktu_dibuat ? $jenis->waktu_dibuat->format('Y-m-d H:i:s') : null,

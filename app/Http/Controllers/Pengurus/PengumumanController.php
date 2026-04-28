@@ -41,7 +41,9 @@ public function detailpengumuman($id)
 {
     $pengumuman = Pengumuman::findOrFail($id);
     return response()->json([
+        'id' => $pengumuman->id,
         'judul' => $pengumuman->judul,
+        'foto' => $pengumuman->foto,
         'deskripsi' => $pengumuman->deskripsi,
         'waktu_dibuat' => $pengumuman->waktu_dibuat,
         'dibuat_oleh' => $pengumuman->dibuat_oleh,

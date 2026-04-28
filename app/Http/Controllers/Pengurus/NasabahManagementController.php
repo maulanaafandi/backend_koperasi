@@ -20,6 +20,7 @@ public function index()
         ->get()
         ->map(function ($item) {
             return [
+                'id' => $item->id,
                 'nama_lengkap' => $item->nama_lengkap,
                 'nomor_rekening' => $item->nomor_rekening,
                 'diaktifkan_oleh' => $item->diaktifkan_oleh,

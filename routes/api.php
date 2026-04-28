@@ -49,6 +49,7 @@ Route::middleware(['auth:sanctum', 'is_admin'])->group(function () {
     Route::get('/admin/detail-jenis-simpanan/{id}', [JenisSimpananController::class, 'show']);
     Route::get('/admin/get-jenis-simpanan/{id}', [JenisSimpananController::class, 'getById']);
     Route::patch('/admin/update-jenis-simpanan/{id}', [JenisSimpananController::class, 'update']);
+    Route::delete('/admin/hapus-jenis-simpanan/{id}', [JenisSimpananController::class, 'destroy']);
 
     Route::get('/admin/lama-angsuran', [LamaAngsuranController::class, 'index']);
     Route::post('/admin/buat-lama-angsuran', [LamaAngsuranController::class, 'store']);
@@ -113,7 +114,7 @@ Route::middleware(['auth:sanctum', 'is_nasabah'])->group(function () {
     Route::get('/nasabah/dashboard', [DashboardNasabahController::class, 'dashboardNasabah']);
 
     Route::get('/nasabah/aktivitas-transaksi', [AktivitasTransaksiController::class, 'aktivitasTransaksiNasabah']);
-    Route::get('/nasabah/detail-aktivitas-transaksi', [AktivitasTransaksiController::class, 'detailAktivitasTransaksi']);
+    Route::get('/nasabah/detail-aktivitas-transaksi/{id}', [AktivitasTransaksiController::class, 'detailAktivitasTransaksi']);
 
     Route::post('/nasabah/bayar-cicilan-pinjaman/{id}', [BayarPinjamanController::class, ' bayarCicilanNasabah']);
     Route::get('/nasabah/bayar-pinjaman', [BayarPinjamanController::class, 'getPinjamanNasabah']);

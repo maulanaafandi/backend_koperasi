@@ -44,7 +44,7 @@ public function store(Request $request)
         $nomorAdmin = auth()->user()->nomor_admin ?? 'ADM000';
         $tenor = Tenor::create([
             'tipe'                => $request->tipe,
-            'lama_angsuran'       => $request->lama_angsuran,
+            'lama_angsuran'       => $request->lama_angsuran_label,
             'bunga'               => $request->bunga,
             'bunga_keterlambatan' => $request->bunga_keterlambatan,
             'dibuat_oleh'         => $nomorAdmin,
@@ -68,7 +68,7 @@ public function store(Request $request)
         return response()->json([
             'id'                  => $tenor->id,
             'tipe'                => $tenor->tipe,
-            'lama_angsuran'       => $tenor->lama_angsuran,
+            'lama_angsuran'       => $tenor->lama_angsuran_label,
             'bunga'               => $tenor->bunga,
             'bunga_keterlambatan' => $tenor->bunga_keterlambatan,
             'waktu_dibuat'        => $tenor->waktu_dibuat ? $tenor->waktu_dibuat->format('Y-m-d H:i:s') : null,
@@ -92,7 +92,7 @@ public function store(Request $request)
         return response()->json([
             'id'                  => $tenor->id,
             'tipe'                => $tenor->tipe,
-            'lama_angsuran'       => $tenor->lama_angsuran,
+            'lama_angsuran'       => $tenor->lama_angsuran_label,
             'bunga'               => $tenor->bunga,
             'bunga_keterlambatan' => $tenor->bunga_keterlambatan,
         ], 200);

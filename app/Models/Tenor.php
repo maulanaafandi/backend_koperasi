@@ -29,4 +29,8 @@ class Tenor extends Model
         'lama_angsuran' => 'integer',
     ];
 
+    public function getLamaAngsuranLabelAttribute()
+    {
+        return $this->lama_angsuran . ' Bulan';
+    }
 }

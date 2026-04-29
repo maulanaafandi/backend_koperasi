@@ -176,7 +176,7 @@ public function bayarCicilan(Request $request)
                 'jumlah_pinjaman' => $item->jumlah_pinjaman,
                 'status' => $item->status,
                 'tipe' => optional($item->tenor)->tipe,
-                'lama_angsuran' => optional($item->tenor)->lama_angsuran,
+                'lama_angsuran' => optional($item->tenor)->lama_angsuran_label,
                 'bunga' => optional($item->tenor)->bunga,
                 'waktu_dibuat' => $item->waktu_dibuat,
                 'dibuat_oleh' => $item->dibuat_oleh,

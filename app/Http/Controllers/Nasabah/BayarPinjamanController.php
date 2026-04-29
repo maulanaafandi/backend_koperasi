@@ -140,7 +140,7 @@ class BayarPinjamanController extends Controller
                 return [
                     'id'               => $item->id,
                     // 'jumlah_pinjaman' => $item->total_pinjaman,
-                    'lama_angsuran'   => $item->tenor->lama_angsuran ?? null,
+                    'lama_angsuran'   => $item->tenor->lama_angsuran_label ?? null,
                     'waktu_disetujui' => $item->waktu_disetujui,
                     'status'          => $item->status,
                 ];
@@ -173,7 +173,7 @@ class BayarPinjamanController extends Controller
             'message' => 'Detail pinjaman',
             'data' => [
                 // 'jumlah_pinjaman' => $pinjaman->total_pinjaman,
-                'lama_angsuran'   => $pinjaman->tenor->lama_angsuran ?? null,
+                'lama_angsuran'   => $pinjaman->tenor->lama_angsuran_label ?? null,
                 'waktu_disetujui' => $pinjaman->waktu_disetujui,
                 'status'          => $pinjaman->status,
                 'jaminan'         => $pinjaman->jaminan,

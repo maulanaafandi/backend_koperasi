@@ -27,7 +27,7 @@ public function index()
                 'id' => $item->id,
                 'nama_lengkap' => optional($item->nasabah)->nama_lengkap,
                 'nomor_rekening' => optional($item->nasabah)->nomor_rekening,
-                'lama_angsuran'  => optional($item->tenor)->lama_angsuran,
+                'lama_angsuran'  => optional($item->tenor)->lama_angsuran_label,
                 'jumlah_pinjaman' => $item->jumlah_pinjaman,
             ];
         })
@@ -52,7 +52,7 @@ public function show($id)
         'data' => [
             'nama_lengkap' => optional($pinjaman->nasabah)->nama_lengkap,
             'nomor_rekening' => optional($pinjaman->nasabah)->nomor_rekening,
-            'lama_angsuran'  => optional($pinjaman->tenor)->lama_angsuran,
+            'lama_angsuran'  => optional($pinjaman->tenor)->lama_angsuran_label,
             'jumlah_pinjaman' => $pinjaman->jumlah_pinjaman,
             'bunga' => $bunga,
             'jaminan' => $pinjaman->jaminan,

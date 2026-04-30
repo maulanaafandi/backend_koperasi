@@ -89,7 +89,7 @@ class DemoSeeder extends Seeder
                 'status' => 'Aktif',
                 'nomor_handphone' => '081234567890',
                 'email' => 'nasabah.demo@example.com',
-                'password' => Hash::make('password'),
+                'password' => Hash::make(env('PASSWORD_NASABAH', 'password')),
                 'waktu_dibuat' => $now,
                 'dibuat_oleh' => $adminNumber,
                 'waktu_diaktifkan' => $now,

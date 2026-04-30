@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'is_pengurus' => \App\Http\Middleware\CheckIsPengurus::class,
             'is_admin' => \App\Http\Middleware\CheckIsAdmin::class,
             'is_nasabah' => \App\Http\Middleware\CheckIsNasabah::class,
+            'check.origin' => \App\Http\Middleware\CheckOrigin::class,
         ]);
     })
     ->withMiddleware(function (Middleware $middleware): void {

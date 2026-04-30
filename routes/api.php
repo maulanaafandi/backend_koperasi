@@ -27,6 +27,9 @@ use App\Http\Controllers\Nasabah\ProfileSettingController;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
+Route::middleware('check.origin')->group(function () {
+
+});
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/nasabah/login', [AuthController::class, 'login']);
 Route::post('/daftar-ulang-pengurus', [AuthController::class, 'daftarUlangPengurus']);
@@ -79,7 +82,7 @@ Route::middleware(['auth:sanctum', 'is_pengurus'])->group(function () {
     Route::get('/pengurus/dashboard', [DashboardPengurusController::class, 'index']);
     Route::get('/pengurus/nama', [DashboardPengurusController::class, 'getNamaPengurus']);
     Route::get('/pengurus/nasabah', [NasabahManagementController::class, 'index']);
-    Route::get('/pengurus/jenis-simpanan-nasabah/{id}', [NasabahManagementController::class, 'getJenisSimpananById']);
+    Route::get('/pengurus/jenis-simpanan-nasabah', [NasabahManagementController::class, 'getJenisSimpananById']);
     Route::get('/pengurus/detail-akun-nasabah/{id}', [NasabahManagementController::class, 'show']);
     Route::get('/pengurus/get-status-akun-nasabah/{id}', [NasabahManagementController::class, 'getStatus']);
     Route::post('/pengurus/buat-nasabah', [NasabahManagementController::class, 'store']);

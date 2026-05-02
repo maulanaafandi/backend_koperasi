@@ -182,4 +182,45 @@ public function bayarCicilan(Request $request)
             ]
         ], 200);
     }
+
+    public function statuslunasPinjaman(Request $request)
+    {
+        $request->validate([
+            'kode_cicilan_pinjaman' => 'required|exists:cicilan_pinjaman,kode_cicilan_pinjaman'
+        ]);
+
+        $cicilan = CicilanPinjaman::with('pinjaman')
+            ->where(
+                'kode_cicilan_pinjaman',
+                $request->kode_cicilan_pinjaman
+            )
+            ->first();
+
+        if (!$cicilan) {
+            return response()->json([
+                'message' => 'Data cicilan tidak ditemukan'
+            ], 404);
+        }
+
+        $pinjaman = $cicilan->pinjaman;
+
+        if (!$pinjaman) {
+            return response()->json([
+                'message' => 'Data pinjaman tidak ditemukan'
+            ], 404);
+        }
+
+        $cicilan->status_angsuran = 'lunas';
+        $cicilan->waktu_dibayar = now();
+        $cicilan->dibayar_oleh = auth()->user()?->nomor_pengurus ?? 'PGR000';
+        $cicilan->save();
+
+        $pinjaman->status = 'Lunas';
+        $pinjaman->sisa_pinjaman = 0;
+        $pinjaman->save();
+
+        return response()->json([
+            'message' => 'Status lunas'
+        ], 200);
+    }
 }

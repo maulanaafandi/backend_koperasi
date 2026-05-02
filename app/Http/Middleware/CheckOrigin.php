@@ -15,7 +15,7 @@ class CheckOrigin
 
         if ($request->headers->get('origin') !== $allowedOrigin) {
             return response()->json([
-                'message' => 'Access denied.'
+                'message' => 'Access denied.Alamat harus sama'
             ], 403);
         }
 

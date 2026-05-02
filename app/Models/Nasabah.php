@@ -70,4 +70,11 @@ class Nasabah extends Authenticatable
     {
         return $this->belongsTo(JenisSimpanan::class, 'id_jenis_simpanan');
     }
+
+    public function getFotoProfilNamaAttribute()
+    {
+        return $this->foto_profil
+            ? basename($this->foto_profil)
+            : null;
+    }
 }

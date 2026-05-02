@@ -17,6 +17,7 @@ class DemoSeeder extends Seeder
         $nasabahIdCard = '3201010101010001';
         $transaksiSetorCode = 'TRX-SETOR-0001';
         $transaksiTarikCode = 'TRX-TARIK-0001';
+        $cicilanpinjamancode = 'CPJM- 0001';
         $rekeningNumber = '8800100001';
 
         DB::table('jenis_simpanan')->updateOrInsert(
@@ -202,6 +203,7 @@ class DemoSeeder extends Seeder
             ['id_pinjaman' => $pinjamanId, 'nomor_angsuran' => 1],
             [
                 'id_transaksi' => null,
+                'kode_cicilan_pinjaman' => $cicilanpinjamancode,
                 'tanggal_jatuh_tempo' => now()->addMonth()->toDateString(),
                 'total_tagihan' => 270000,
                 'tagihan_pokok' => 250000,

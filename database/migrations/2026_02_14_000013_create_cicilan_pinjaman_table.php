@@ -21,6 +21,7 @@ return new class extends Migration
                   ->constrained('transaksi')
                   ->restrictOnDelete();    
             $table->integer('nomor_angsuran');
+            $table->string('kode_cicilan_pinjaman')->unique();
             $table->date('tanggal_jatuh_tempo');
             $table->decimal('total_tagihan', 15, 2);
             $table->decimal('tagihan_pokok', 15, 2);

@@ -13,6 +13,7 @@ class CicilanPinjaman extends Model
         'id_pinjaman',
         'id_transaksi',
         'nomor_angsuran',
+        'kode_cicilan_pinjaman',
         'tanggal_jatuh_tempo',
         'total_tagihan',
         'tagihan_pokok',

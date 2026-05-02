@@ -33,6 +33,7 @@ class AktivitasTransaksiController extends Controller
             'message' => 'Aktivitas transaksi nasabah',
             'data' => $data->map(function ($item) {
                 return [
+                    'id' => $item->id,
                     'kode_transaksi' => $item->kode_transaksi,
                     'saldo' => $item->saldo,
                     'waktu_dibuat' => $item->waktu_dibuat,

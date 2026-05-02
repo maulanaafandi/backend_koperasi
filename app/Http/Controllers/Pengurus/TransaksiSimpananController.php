@@ -12,7 +12,7 @@ use App\Models\Simpanan;
 
 class TransaksiSimpananController extends Controller
 {
- public function simpan(Request $request)
+public function simpan(Request $request)
 {
     $request->validate([
         'nomor_rekening' => 'required|exists:nasabah,nomor_rekening',
@@ -30,7 +30,7 @@ class TransaksiSimpananController extends Controller
         }
 
         $saldoSebelum = $nasabah->saldo;
-        $jumlah       = $request->saldo;
+        $jumlah = $request->saldo;
         $saldoSesudah = $saldoSebelum + $jumlah;
 
         $kode = 'TRX-' . date('Ymd') . '-' . strtoupper(Str::random(5));
@@ -38,30 +38,31 @@ class TransaksiSimpananController extends Controller
         $pengurusLogin = auth()->user()?->nomor_pengurus ?? 'PGR000';
 
         $transaksi = Transaksi::create([
-            'id_nasabah'        => $nasabah->id,
-            'kode_transaksi'    => $kode,
-            'jenis_transaksi'   => 'setor_tunai',
-            'saldo'             => $jumlah,
-            'saldo_sebelum'     => $saldoSebelum,
-            'saldo_sesudah'     => $saldoSesudah,
-            'status_transaksi'  => 'sukses',
-            'dibuat_oleh'       => $pengurusLogin,
+            'id_nasabah' => $nasabah->id,
+            'kode_transaksi' => $kode,
+            'jenis_transaksi' => 'setor_tunai',
+            'saldo' => $jumlah,
+            'saldo_sebelum' => $saldoSebelum,
+            'saldo_sesudah' => $saldoSesudah,
+            'status_transaksi' => 'sukses',
+            'dibuat_oleh' => $pengurusLogin,
             'waktu_transaksi_sukses' => now()
         ]);
 
-        $saldoSebelum = $nasabah->saldo;
-        $jumlah       = $request->saldo;
-
-        $jenisSimpanan = $nasabah->jenisSimpanan;
-
-        if ($jenisSimpanan && $jumlah < $jenisSimpanan->saldo_minimal) {
-            return response()->json([
-                'message' => "Minimal setor untuk {$jenisSimpanan->nama_simpanan} adalah Rp " . number_format($jenisSimpanan->saldo_minimal, 0, ',', '.')
-            ], 422);
-        }
+        $nasabah->saldo = $saldoSesudah;
+        $nasabah->save();
 
         return response()->json([
-            'message' => 'Berhasil simpan saldo.'
+            'message' => 'Berhasil simpan saldo',
+            'data' => [
+                'kode_transaksi' => $transaksi->kode_transaksi,
+                'saldo' => $transaksi->saldo,
+                'saldo_sebelum' => $transaksi->saldo_sebelum,
+                'saldo_sesudah' => $transaksi->saldo_sesudah,
+                'status_transaksi' => $transaksi->status_transaksi,
+                'dibuat_oleh' => $transaksi->dibuat_oleh,
+                'waktu_dibuat' => $transaksi->waktu_transaksi_sukses,
+            ]
         ], 201);
     });
 }

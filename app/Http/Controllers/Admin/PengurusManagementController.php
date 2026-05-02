@@ -61,27 +61,44 @@ public function updateStatus(Request $request, $id)
     $pengurus = Pengurus::findOrFail($id);
     $adminLogin = auth()->user()->nomor_admin ?? 'Admin';
 
+    if (
+        $pengurus->status_akun === null &&
+        !$pengurus->waktu_daftar_ulang
+    ) {
+        return response()->json([
+            'message' => 'Pengurus belum melakukan daftar ulang.'
+        ], 422);
+    }
+
     if ($request->status_akun === 'Aktif') {
-        if (!$pengurus->waktu_daftar_ulang) {
-            return response()->json(['message' => 'Gagal. Pengurus belum melakukan daftar ulang.'], 422);
-        }
 
         $pengurus->status_akun      = 'Aktif';
         $pengurus->waktu_diaktifkan = now();
         $pengurus->diaktifkan_oleh  = $adminLogin;
-        
+
+        // reset data nonaktif
         $pengurus->waktu_dinonaktifkan = null;
         $pengurus->dinonaktifkan_oleh  = null;
 
     } elseif ($request->status_akun === 'Non-Aktif') {
+
         $pengurus->status_akun         = 'Non-Aktif';
         $pengurus->waktu_dinonaktifkan = now();
         $pengurus->dinonaktifkan_oleh  = $adminLogin;
+
+    } elseif ($request->status_akun === 'Proses') {
+
+        $pengurus->status_akun = 'Proses';
+
+        $pengurus->waktu_diaktifkan = null;
+        $pengurus->diaktifkan_oleh  = null;
     }
 
     $pengurus->save();
 
-    return response()->json(['message' => 'Status berhasil diperbarui.']);
+    return response()->json([
+        'message' => 'Status berhasil diperbarui.'
+    ]);
 }
 
 public function resetPassword($id)

@@ -114,9 +114,12 @@ public function daftarUlangPengurus(Request $request)
         return response()->json($validator->errors(), 422);
     }
 
-    if ($pengurus->waktu_daftar_ulang !== null) {
+    if (
+        $pengurus->status_akun !== null ||
+        $pengurus->password !== null
+    ) {
         return response()->json([
-            'message' => 'Anda sudah daftar ulang. Tunggu aktivasi admin.'
+            'message' => 'Anda sudah melakukan daftar ulang.'
         ], 403);
     }
 

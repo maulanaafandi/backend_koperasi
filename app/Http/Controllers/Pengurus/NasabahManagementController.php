@@ -109,6 +109,58 @@ public function store(Request $request)
         'nama_ibu_kandung' => 'required|string',
         'foto_profil' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         'tipe' => ['required', Rule::in(['Non-Anggota', 'Anggota'])],
+    ], [
+        'id_jenis_simpanan.required' => 'Jenis simpanan wajib dipilih.',
+        'id_jenis_simpanan.exists' => 'Jenis simpanan tidak ditemukan.',
+
+        'nomor_induk_kependudukan.required' => 'Nomor induk kependudukan wajib diisi.',
+        'nomor_induk_kependudukan.digits' => 'Nomor induk kependudukan harus 16 digit.',
+        'nomor_induk_kependudukan.unique' => 'Nomor induk kependudukan sudah digunakan.',
+
+        'nama_lengkap.required' => 'Nama lengkap wajib diisi.',
+        'nama_lengkap.max' => 'Nama lengkap maksimal 255 karakter.',
+
+        'email.email' => 'Format email tidak valid.',
+        'email.unique' => 'Email sudah digunakan.',
+
+        'tanggal_lahir.required' => 'Tanggal lahir wajib diisi.',
+        'tanggal_lahir.date' => 'Format tanggal lahir tidak valid.',
+
+        'tempat_lahir.required' => 'Tempat lahir wajib diisi.',
+
+        'jenis_kelamin.required' => 'Jenis kelamin wajib dipilih.',
+        'jenis_kelamin.in' => 'Jenis kelamin tidak valid.',
+
+        'status_perkawinan.required' => 'Status perkawinan wajib dipilih.',
+        'status_perkawinan.in' => 'Status perkawinan tidak valid.',
+
+        'nomor_handphone.max' => 'Nomor handphone maksimal 15 karakter.',
+        'nomor_handphone.unique' => 'Nomor handphone sudah digunakan.',
+
+        'alamat_ktp.required' => 'Alamat KTP wajib diisi.',
+
+        'RT.required' => 'RT wajib diisi.',
+        'RT.max' => 'RT maksimal 3 karakter.',
+
+        'RW.required' => 'RW wajib diisi.',
+        'RW.max' => 'RW maksimal 3 karakter.',
+
+        'jenis_pekerjaan.required' => 'Jenis pekerjaan wajib diisi.',
+        'jenis_pekerjaan.max' => 'Jenis pekerjaan maksimal 100 karakter.',
+
+        'gaji_pekerjaan.required' => 'Gaji pekerjaan wajib diisi.',
+        'gaji_pekerjaan.numeric' => 'Gaji pekerjaan harus berupa angka.',
+        'gaji_pekerjaan.min' => 'Gaji pekerjaan tidak boleh kurang dari 0.',
+
+        'nama_ibu_kandung.required' => 'Nama ibu kandung wajib diisi.',
+
+        'foto_profil.required' => 'Foto profil wajib diupload.',
+        'foto_profil.image' => 'Foto profil harus berupa gambar.',
+        'foto_profil.mimes' => 'Foto profil harus berformat jpeg, png, atau jpg.',
+        'foto_profil.max' => 'Ukuran foto profil maksimal 2 MB.',
+
+        'tipe.required' => 'Tipe nasabah wajib dipilih.',
+        'tipe.in' => 'Tipe nasabah tidak valid.',
     ]);
 
     $tahun = date('Y');
@@ -147,15 +199,11 @@ public function store(Request $request)
     $nasabah->jenis_pekerjaan = $request->jenis_pekerjaan;
     $nasabah->gaji_pekerjaan = $request->gaji_pekerjaan;
     $nasabah->nama_ibu_kandung = $request->nama_ibu_kandung;
-
     $nasabah->foto_profil = $request->file('foto_profil');
-
     $nasabah->tipe = $request->tipe;
-
     $nasabah->status = 'Aktif';
     $nasabah->saldo = 0;
     $nasabah->pin = null;
-
     $nasabah->dibuat_oleh = $pengurusLogin;
     $nasabah->waktu_diaktifkan = now();
     $nasabah->diaktifkan_oleh = $pengurusLogin;

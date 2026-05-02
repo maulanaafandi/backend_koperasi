@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use Carbon\Carbon;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class Pengurus extends Authenticatable
 {
@@ -40,4 +43,22 @@ class Pengurus extends Authenticatable
     ];
 
     protected $hidden = ['password'];
+
+    public function setFotoProfilAttribute($value)
+    {
+        if ($value instanceof UploadedFile) {
+
+            $extension = $value->getClientOriginalExtension();
+
+            $namaFoto = Str::random(40) . '.' . $extension;
+
+            $value->storeAs(
+                'foto_pengurus',
+                $namaFoto,
+                'public'
+            );
+
+            $this->attributes['foto_profil'] = $namaFoto;
+        }
+    }
 }

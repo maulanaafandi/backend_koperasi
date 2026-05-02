@@ -3,6 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class Pengumuman extends Model
 {
@@ -27,4 +30,21 @@ class Pengumuman extends Model
         });
     }
     
+public function setFotoAttribute($value)
+{
+    if ($value instanceof UploadedFile) {
+
+        $extension = $value->getClientOriginalExtension();
+
+        $namaFoto = Str::random(40) . '.' . $extension;
+
+        $value->storeAs(
+            'pengumuman',
+            $namaFoto,
+            'public'
+        );
+
+        $this->attributes['foto'] = $namaFoto;
+    }
+}
 }

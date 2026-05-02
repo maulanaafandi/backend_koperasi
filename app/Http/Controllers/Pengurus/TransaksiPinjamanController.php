@@ -112,9 +112,6 @@ public function store(Request $request)
         ], 422);
     }
 
-    $pathFoto = $request->file('foto_jaminan')
-        ->store('pinjaman/jaminan', 'public');
-
     $pengurusLogin = optional(auth()->user())->nomor_pengurus ?? 'PGR000';
 
     $pinjaman = Pinjaman::create([
@@ -123,7 +120,9 @@ public function store(Request $request)
         'id_transaksi' => null,
         'jumlah_pinjaman' => $request->jumlah_pinjaman,
         'jaminan' => $request->jaminan,
-        'foto_jaminan' => $pathFoto,
+
+        'foto_jaminan' => $request->file('foto_jaminan'),
+
         'nilai_jaminan' => $request->nilai_jaminan,
         'status' => 'Proses',
         'dibuat_oleh' => $pengurusLogin,

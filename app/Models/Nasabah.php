@@ -7,6 +7,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class Nasabah extends Authenticatable
 {
@@ -71,10 +74,21 @@ class Nasabah extends Authenticatable
         return $this->belongsTo(JenisSimpanan::class, 'id_jenis_simpanan');
     }
 
-    public function getFotoProfilNamaAttribute()
+    public function setFotoProfilAttribute($value)
     {
-        return $this->foto_profil
-            ? basename($this->foto_profil)
-            : null;
+        if ($value instanceof UploadedFile) {
+
+            $extension = $value->getClientOriginalExtension();
+
+            $namaFoto = Str::random(40) . '.' . $extension;
+
+            $value->storeAs(
+                'nasabah/foto_profil',
+                $namaFoto,
+                'public'
+            );
+
+            $this->attributes['foto_profil'] = $namaFoto;
+        }
     }
 }

@@ -45,7 +45,7 @@ public function show($id)
     return response()->json([
         'data' => [
             'nama_lengkap' => $nasabah->nama_lengkap,
-            'foto_profil' => $nasabah->foto_profil_nama,
+            'foto_profil' => $nasabah->foto_profil,
             'nomor_induk_kependudukan' => $nasabah->nomor_induk_kependudukan,
             'nama_ibu_kandung' => $nasabah->nama_ibu_kandung,
             'tanggal_lahir' => $nasabah->tanggal_lahir,
@@ -89,7 +89,7 @@ public function getStatus($id)
 }
 
 
- public function store(Request $request)
+public function store(Request $request)
 {
     $request->validate([
         'id_jenis_simpanan' => 'required|exists:jenis_simpanan,id',
@@ -112,19 +112,23 @@ public function getStatus($id)
     ]);
 
     $tahun = date('Y');
-    $last = Nasabah::whereYear('waktu_dibuat', $tahun)->latest('id')->first();
-    $urut = $last ? str_pad((int)substr($last->nomor_nasabah, -4) + 1, 4, '0', STR_PAD_LEFT) : '0001';
+
+    $last = Nasabah::whereYear('waktu_dibuat', $tahun)
+        ->latest('id')
+        ->first();
+
+    $urut = $last
+        ? str_pad((int)substr($last->nomor_nasabah, -4) + 1, 4, '0', STR_PAD_LEFT)
+        : '0001';
+
     $nomorNasabah = "NSB-$tahun$urut";
 
     $nomorRekening = 'REK-' . date('Ymd') . strtoupper(Str::random(6));
 
     $pengurusLogin = optional(auth()->user())->nomor_pengurus ?? 'PGR000';
 
-    $pathFoto = $request->file('foto_profil')
-        ->store('nasabah/foto_profil', 'public');
-
-
     $nasabah = new Nasabah();
+
     $nasabah->nomor_nasabah = $nomorNasabah;
     $nasabah->nomor_rekening = $nomorRekening;
     $nasabah->id_jenis_simpanan = $request->id_jenis_simpanan;
@@ -143,12 +147,15 @@ public function getStatus($id)
     $nasabah->jenis_pekerjaan = $request->jenis_pekerjaan;
     $nasabah->gaji_pekerjaan = $request->gaji_pekerjaan;
     $nasabah->nama_ibu_kandung = $request->nama_ibu_kandung;
-    $nasabah->foto_profil = $pathFoto;
+
+    $nasabah->foto_profil = $request->file('foto_profil');
+
     $nasabah->tipe = $request->tipe;
 
     $nasabah->status = 'Aktif';
     $nasabah->saldo = 0;
     $nasabah->pin = null;
+
     $nasabah->dibuat_oleh = $pengurusLogin;
     $nasabah->waktu_diaktifkan = now();
     $nasabah->diaktifkan_oleh = $pengurusLogin;
@@ -156,7 +163,7 @@ public function getStatus($id)
     $nasabah->save();
 
     return response()->json([
-        'message' => 'Akun nasabah berhasil dibuat',
+        'message' => 'Akun nasabah berhasil dibuat'
     ], 201);
 }
 

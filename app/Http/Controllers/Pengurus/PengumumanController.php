@@ -60,25 +60,18 @@ public function store(Request $request)
         'foto' => 'nullable|image'
     ]);
 
-    $fotoPath = null;
-    if ($request->hasFile('foto')) {
-        $fotoPath = $request->file('foto')->store('pengumuman', 'public');
-    }
-
     $pengurusLogin = auth()->user()->nomor_pengurus ?? 'PGR000';
 
     $pengumuman = Pengumuman::create([
         'judul' => $request->judul,
-        'foto' => $fotoPath,
+        'foto' => $request->file('foto'),
         'deskripsi' => $request->deskripsi,
-
         'dibuat_oleh' => $pengurusLogin,
-        'diubah_oleh' => null, 
+        'diubah_oleh' => null,
     ]);
 
     return response()->json([
-        'message' => 'Pengumuman berhasil dibuat',
-        // 'data' => $pengumuman
+        'message' => 'Pengumuman berhasil dibuat'
     ]);
 }
 

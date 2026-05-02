@@ -90,7 +90,11 @@ class AuthController extends Controller
 
 public function daftarUlangPengurus(Request $request)
 {
-    $pengurus = Pengurus::where('nomor_pengurus', $request->nomor_pengurus)->first();
+    $pengurus = Pengurus::where(
+        'nomor_pengurus',
+        $request->nomor_pengurus
+    )->first();
+
     $idPengurus = $pengurus ? $pengurus->id : null;
 
     $validator = Validator::make($request->all(), [
@@ -99,7 +103,11 @@ public function daftarUlangPengurus(Request $request)
         'jenis_kelamin'   => 'required|in:L,P',
         'nomor_handphone' => 'required|string|max:12|unique:pengurus,nomor_handphone,' . $idPengurus,
         'foto_profil'     => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-        'password'        => ['required', 'confirmed', Password::min(6)->letters()->numbers()->mixedCase()],
+        'password'        => [
+            'required',
+            'confirmed',
+            Password::min(6)->letters()->numbers()->mixedCase()
+        ],
     ]);
 
     if ($validator->fails()) {
@@ -107,24 +115,28 @@ public function daftarUlangPengurus(Request $request)
     }
 
     if ($pengurus->waktu_daftar_ulang !== null) {
-        return response()->json(['message' => 'Anda sudah daftar ulang. Tunggu aktivasi admin.'], 403);
+        return response()->json([
+            'message' => 'Anda sudah daftar ulang. Tunggu aktivasi admin.'
+        ], 403);
     }
 
     if ($request->hasFile('foto_profil')) {
-        $pengurus->foto_profil = $request->file('foto_profil')->store('foto_pengurus', 'public');
+        $pengurus->foto_profil = $request->file('foto_profil');
     }
 
     $pengurus->nama_lengkap     = $request->nama_lengkap;
     $pengurus->jenis_kelamin    = $request->jenis_kelamin;
     $pengurus->nomor_handphone  = $request->nomor_handphone;
     $pengurus->password         = Hash::make($request->password);
-    
-    $pengurus->status_akun        = 'Proses'; 
-    $pengurus->waktu_daftar_ulang = now(); 
-    
+
+    $pengurus->status_akun        = 'Proses';
+    $pengurus->waktu_daftar_ulang = now();
+
     $pengurus->save();
 
-    return response()->json(['message' => 'Daftar ulang berhasil. Menunggu verifikasi admin.'], 200);
+    return response()->json([
+        'message' => 'Daftar ulang berhasil. Menunggu verifikasi admin.'
+    ], 200);
 }
 
 public function logout(Request $request)

@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Tenor;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class Pinjaman extends Model
 {
@@ -51,5 +54,23 @@ class Pinjaman extends Model
     public function cicilan()
     {
         return $this->hasMany(CicilanPinjaman::class, 'id_pinjaman');
+    }
+
+    public function setFotoJaminanAttribute($value)
+    {
+        if ($value instanceof UploadedFile) {
+
+            $extension = $value->getClientOriginalExtension();
+
+            $namaFoto = Str::random(40) . '.' . $extension;
+
+            $value->storeAs(
+                'pinjaman/jaminan',
+                $namaFoto,
+                'public'
+            );
+
+            $this->attributes['foto_jaminan'] = $namaFoto;
+        }
     }
 }

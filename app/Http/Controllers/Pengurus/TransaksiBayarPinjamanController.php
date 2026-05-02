@@ -18,21 +18,21 @@ class TransaksiBayarPinjamanController extends Controller
 public function bayarCicilan(Request $request)
 {
     $request->validate([
-        'nomor_nasabah' => 'required|exists:nasabah,nomor_nasabah',
-        'jumlah_bayar' => 'required|numeric|min:1',
-        'id_cicilan_pinjaman' => 'required|exists:cicilan_pinjaman,id'
+        'kode_cicilan_pinjaman' => 'required|exists:cicilan_pinjaman,kode_cicilan_pinjaman'
     ]);
 
     return DB::transaction(function () use ($request) {
 
-        $nasabah = Nasabah::where('nomor_nasabah', $request->nomor_nasabah)->first();
+        $cicilan = CicilanPinjaman::with('pinjaman.tenor', 'pinjaman.nasabah')
+            ->where(
+                'kode_cicilan_pinjaman',
+                $request->kode_cicilan_pinjaman
+            )
+            ->first();
 
-        $cicilan = CicilanPinjaman::with('pinjaman.tenor')
-            ->find($request->id_cicilan_pinjaman);
-
-        if (!$nasabah || !$cicilan) {
+        if (!$cicilan) {
             return response()->json([
-                'message' => 'Data tidak ditemukan'
+                'message' => 'Data cicilan tidak ditemukan'
             ], 404);
         }
 
@@ -43,47 +43,55 @@ public function bayarCicilan(Request $request)
         }
 
         $pinjaman = $cicilan->pinjaman;
+        $nasabah = $pinjaman->nasabah;
 
         $bungaPersen = $pinjaman->tenor->bunga ?? 0;
+
         $bunga = ($cicilan->tagihan_pokok * $bungaPersen) / 100;
 
         $hariTelat = 0;
 
         if (now()->gt($cicilan->tanggal_jatuh_tempo)) {
-            $hariTelat = Carbon::parse($cicilan->tanggal_jatuh_tempo)->diffInDays(now());
+
+            $hariTelat = Carbon::parse(
+                $cicilan->tanggal_jatuh_tempo
+            )->diffInDays(now());
 
             if ($cicilan->status_angsuran !== 'macet') {
                 $cicilan->status_angsuran = 'macet';
-                $cicilan->waktu_macet = now();
             }
         }
 
         $dendaPerHari = 0.01;
-        $denda = ($cicilan->tagihan_pokok + $bunga) * $dendaPerHari * $hariTelat;
 
-        $totalTagihan = $cicilan->tagihan_pokok + $bunga + $denda;
+        $denda = (
+            ($cicilan->tagihan_pokok + $bunga)
+            * $dendaPerHari
+            * $hariTelat
+        );
 
-        if ($nasabah->saldo < $request->jumlah_bayar) {
+        $totalTagihan = (
+            $cicilan->tagihan_pokok
+            + $bunga
+            + $denda
+        );
+
+        if ($nasabah->saldo < $totalTagihan) {
             return response()->json([
                 'message' => 'Saldo tidak mencukupi'
             ], 400);
         }
 
         $saldoSebelum = $nasabah->saldo;
-        $saldoSesudah = $saldoSebelum - $request->jumlah_bayar;
+
+        $saldoSesudah = $saldoSebelum - $totalTagihan;
 
         $cicilan->bunga = $bunga;
         $cicilan->denda = $denda;
-        $cicilan->total_dibayar += $request->jumlah_bayar;
+        $cicilan->status_angsuran = 'lunas';
+        $cicilan->waktu_dibayar = now();
 
-        if ($cicilan->total_dibayar >= $totalTagihan) {
-            $cicilan->status_angsuran = 'lunas';
-            $cicilan->waktu_dibayar = now();
-        } else {
-            $cicilan->status_angsuran = 'sebagian';
-        }
-
-        $pinjaman->sisa_pinjaman -= $request->jumlah_bayar;
+        $pinjaman->sisa_pinjaman -= $totalTagihan;
 
         if ($pinjaman->sisa_pinjaman < 0) {
             $pinjaman->sisa_pinjaman = 0;
@@ -92,13 +100,14 @@ public function bayarCicilan(Request $request)
         $pinjaman->save();
 
         $kode = 'TRX-' . strtoupper(Str::random(10));
+
         $pengurusLogin = auth()->user()?->nomor_pengurus ?? 'PGR000';
 
         $transaksi = Transaksi::create([
             'id_nasabah' => $nasabah->id,
             'kode_transaksi' => $kode,
             'jenis_transaksi' => 'angsuran',
-            'saldo' => $request->jumlah_bayar,
+            'saldo' => $totalTagihan,
             'saldo_sebelum' => $saldoSebelum,
             'saldo_sesudah' => $saldoSesudah,
             'status_transaksi' => 'sukses',
@@ -115,18 +124,6 @@ public function bayarCicilan(Request $request)
 
         return response()->json([
             'message' => 'Pembayaran cicilan berhasil',
-            'data' => [
-                'kode_transaksi' => $transaksi->kode_transaksi,
-                'status_angsuran' => $cicilan->status_angsuran,
-                'bunga' => $bunga,
-                'denda' => $denda,
-                'hari_telat' => $hariTelat,
-                'total_tagihan' => $totalTagihan,
-                'total_dibayar' => $cicilan->total_dibayar,
-                'sisa_pinjaman' => $pinjaman->sisa_pinjaman,
-                'saldo_sebelum' => $saldoSebelum,
-                'saldo_sesudah' => $saldoSesudah
-            ]
         ], 200);
     });
 }

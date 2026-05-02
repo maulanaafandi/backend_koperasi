@@ -87,7 +87,7 @@ public function getStatus($id)
 public function store(Request $request)
 {
     $validator = Validator::make($request->all(), [
-        'id_nasabah' => 'required|exists:nasabah,id',
+        'nomor_rekening' => 'required|exists:nasabah,nomor_rekening',
         'id_tenor' => 'required|exists:tenor,id',
         'jumlah_pinjaman' => 'required|numeric|min:1000000|max:150000000',
         'jaminan' => 'required|string',
@@ -99,8 +99,12 @@ public function store(Request $request)
         return response()->json($validator->errors(), 422);
     }
 
-    $nasabah = Nasabah::findOrFail($request->id_nasabah);
-    $tenor   = Tenor::findOrFail($request->id_tenor);
+    $nasabah = Nasabah::where(
+        'nomor_rekening',
+        $request->nomor_rekening
+    )->first();
+
+    $tenor = Tenor::findOrFail($request->id_tenor);
 
     if ($nasabah->tipe !== $tenor->tipe) {
         return response()->json([
@@ -125,8 +129,26 @@ public function store(Request $request)
         'dibuat_oleh' => $pengurusLogin,
     ]);
 
+    $kodeCicilan = 'CIC-' . strtoupper(Str::random(8));
+
+    CicilanPinjaman::create([
+        'id_pinjaman' => $pinjaman->id,
+        'kode_cicilan_pinjaman' => $kodeCicilan,
+        'nomor_angsuran' => 1,
+        'tanggal_jatuh_tempo' => now()->addMonth(),
+        'total_tagihan' => $request->jumlah_pinjaman,
+        'tagihan_pokok' => $request->jumlah_pinjaman,
+        'bunga' => 0,
+        'denda' => 0,
+        'status_angsuran' => 'belum_jatuh_tempo',
+        'dibayar_oleh' => null,
+    ]);
+
     return response()->json([
         'message' => 'Pengajuan pinjaman berhasil dibuat',
+        'data' => [
+            'kode_cicilan_pinjaman' => $kodeCicilan
+        ]
     ], 201);
 }
 

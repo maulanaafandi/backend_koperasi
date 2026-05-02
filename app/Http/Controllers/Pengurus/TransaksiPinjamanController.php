@@ -203,4 +203,18 @@ public function approve($id)
     }
 }
 
+    public function getAllTenor()
+    {
+        $tenor = Tenor::all();
+
+        return response()->json([
+            'data' => $tenor->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'lama_angsuran' => $item->lama_angsuran . ' Bulan',
+                    'bunga' => $item->bunga,
+                ];
+            })
+        ], 200);
+    }
 }

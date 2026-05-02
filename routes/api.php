@@ -82,7 +82,7 @@ Route::middleware(['auth:sanctum', 'is_pengurus'])->group(function () {
     Route::get('/pengurus/dashboard', [DashboardPengurusController::class, 'index']);
     Route::get('/pengurus/nama', [DashboardPengurusController::class, 'getNamaPengurus']);
     Route::get('/pengurus/nasabah', [NasabahManagementController::class, 'index']);
-    Route::get('/pengurus/jenis-simpanan-nasabah', [NasabahManagementController::class, 'getJenisSimpananById']);
+    Route::get('/pengurus/jenis-simpanan-nasabah', [NasabahManagementController::class, 'getJenisSimpanan']);
     Route::get('/pengurus/detail-akun-nasabah/{id}', [NasabahManagementController::class, 'show']);
     Route::get('/pengurus/get-status-akun-nasabah/{id}', [NasabahManagementController::class, 'getStatus']);
     Route::post('/pengurus/buat-nasabah', [NasabahManagementController::class, 'store']);
@@ -98,6 +98,7 @@ Route::middleware(['auth:sanctum', 'is_pengurus'])->group(function () {
 
     Route::get('/pengurus/transaksi-pinjam', [TransaksiPinjamanController::class, 'index']);
     Route::get('/pengurus/detail-transaksi-pinjam/{id}', [TransaksiPinjamanController::class, 'show']);
+    Route::get('/pengurus/lama-angsuran-nasabah', [TransaksiPinjamanController::class, 'getAllTenor']);
     Route::get('/pengurus/status-transaksi-pinjam/{id}', [TransaksiPinjamanController::class, 'getStatus']);
     Route::post('/pengurus/buat-transaksi-pinjam', [TransaksiPinjamanController::class, 'store']);
     Route::patch('/pengurus/update-transaksi-pinjam/{id}', [TransaksiPinjamanController::class, 'approve']);

@@ -232,22 +232,18 @@ public function resetPassword($id)
     ], 200);
 }
 
-    public function getJenisSimpananById($id)
+    public function getJenisSimpanan()
     {
-        $jenisSimpanan = JenisSimpanan::where('id', $id)->first();
-
-        if (!$jenisSimpanan) {
-            return response()->json([
-                'message' => 'Jenis simpanan tidak ditemukan'
-            ], 404);
-        }
+        $jenisSimpanan = JenisSimpanan::all();
 
         return response()->json([
-            'data' => [
-                'id_jenis_simpanan' => $jenisSimpanan->id,
-                'nama_simpanan' => $jenisSimpanan->nama_simpanan,
-                'saldo_minimal' => $jenisSimpanan->saldo_minimal,
-            ]
+            'data' => $jenisSimpanan->map(function ($item) {
+                return [
+                    'id_jenis_simpanan' => $item->id,
+                    'nama_simpanan' => $item->nama_simpanan,
+                    'saldo_minimal' => $item->saldo_minimal,
+                ];
+            })
         ], 200);
     }
 }

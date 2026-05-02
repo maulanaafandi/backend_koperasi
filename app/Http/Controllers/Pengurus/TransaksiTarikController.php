@@ -28,12 +28,6 @@ class TransaksiTarikController extends Controller
             ], 404);
         }
 
-        if ($nasabah->tipe === 'Anggota') {
-            return response()->json([
-                'message' => 'Penarikan tidak diizinkan untuk nasabah dengan status Anggota.'
-            ], 403);
-        }
-
         $saldoSebelum = $nasabah->saldo;
         $jumlah       = $request->saldo;
 

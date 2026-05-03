@@ -78,6 +78,7 @@ public function detailBayarCicilan(Request $request)
 
     return response()->json([
         'data' => [
+            'kode_cicilan_pinjaman' => $cicilan->kode_cicilan_pinjaman,
             'nama_lengkap' => $nasabah->nama_lengkap,
             'nomor_rekening' => $nasabah->nomor_rekening,
             'nomor_angsuran' => $cicilan->nomor_angsuran,

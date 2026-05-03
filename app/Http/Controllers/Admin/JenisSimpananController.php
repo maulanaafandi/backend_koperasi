@@ -98,6 +98,7 @@ public function getById($id)
     }
 
     return response()->json([
+        'id' => $jenis->id,
         'nama_simpanan' => $jenis->nama_simpanan,
         'saldo_minimal' => $jenis->saldo_minimal,
     ], 200);

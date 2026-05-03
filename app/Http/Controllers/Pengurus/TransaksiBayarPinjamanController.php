@@ -35,6 +35,19 @@ public function detailBayarCicilan(Request $request)
     }
 
     $pinjaman = $cicilan->pinjaman;
+
+    if (!$pinjaman) {
+        return response()->json([
+            'message' => 'Data pinjaman tidak ditemukan'
+        ], 404);
+    }
+
+    if ($pinjaman->status !== 'Disetujui') {
+        return response()->json([
+            'message' => 'Pinjaman belum disetujui'
+        ], 422);
+    }
+    
     $nasabah = $pinjaman->nasabah;
 
     $bungaPersen = $pinjaman->tenor->bunga ?? 0;

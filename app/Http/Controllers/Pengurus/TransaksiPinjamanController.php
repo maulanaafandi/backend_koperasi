@@ -208,13 +208,7 @@ public function approve($id)
             ]);
 
             return response()->json([
-                'message' => 'Pinjaman disetujui dan dana berhasil dicairkan',
-                'data' => [
-                    'kode_transaksi' => $transaksi->kode_transaksi,
-                    'jumlah' => $jumlah,
-                    'saldo_sebelum' => $saldoSebelum,
-                    'saldo_sesudah' => $saldoSesudah
-                ]
+                'message' => 'Pinjaman disetujui'
             ], 200);
         });
 

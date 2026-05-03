@@ -42,11 +42,11 @@ public function detailBayarCicilan(Request $request)
         ], 404);
     }
 
-    if ($pinjaman->status !== 'Disetujui') {
-        return response()->json([
-            'message' => 'Pinjaman belum disetujui'
-        ], 422);
-    }
+    // if ($pinjaman->status !== 'Disetujui') {
+    //     return response()->json([
+    //         'message' => 'Pinjaman belum disetujui'
+    //     ], 422);
+    // }
 
     $nasabah = $pinjaman->nasabah;
 
@@ -164,11 +164,11 @@ public function detailBayarCicilan(Request $request)
             ], 404);
         }
 
-        if ($pinjaman->status !== 'Disetujui') {
-        return response()->json([
-            'message' => 'Pinjaman belum disetujui'
-        ], 422);
-        }
+        // if ($pinjaman->status !== 'Disetujui') {
+        // return response()->json([
+        //     'message' => 'Pinjaman belum disetujui'
+        // ], 422);
+        // }
 
         $cicilan->status_angsuran = 'lunas';
         $cicilan->waktu_dibayar = now();

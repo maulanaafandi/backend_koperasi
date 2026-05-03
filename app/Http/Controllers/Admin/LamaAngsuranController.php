@@ -44,7 +44,7 @@ public function store(Request $request)
         $nomorAdmin = auth()->user()->nomor_admin ?? 'ADM000';
         $tenor = Tenor::create([
             'tipe'                => $request->tipe,
-            'lama_angsuran'       => $request->lama_angsuran_label,
+            'lama_angsuran'       => $request->lama_angsuran,
             'bunga'               => $request->bunga,
             'bunga_keterlambatan' => $request->bunga_keterlambatan,
             'dibuat_oleh'         => $nomorAdmin,

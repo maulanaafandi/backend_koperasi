@@ -55,9 +55,8 @@ class Nasabah extends Authenticatable
         'password',
     ];
 
-
     protected $casts = [
-        'tanggal_lahir' => 'date',
+        'tanggal_lahir' => 'date:Y-m-d',
         'gaji_pekerjaan' => 'decimal:2',
         'waktu_dibuat' => 'datetime',
         'waktu_diaktifkan' => 'datetime',
@@ -73,7 +72,7 @@ class Nasabah extends Authenticatable
     {
         return $this->belongsTo(JenisSimpanan::class, 'id_jenis_simpanan');
     }
-
+ 
     public function setFotoProfilAttribute($value)
     {
         if ($value instanceof UploadedFile) {
@@ -90,5 +89,12 @@ class Nasabah extends Authenticatable
 
             $this->attributes['foto_profil'] = $namaFoto;
         }
+    }
+
+    public function getTanggalLahirFormatAttribute()
+    {
+        return $this->tanggal_lahir
+            ? $this->tanggal_lahir->format('Y-m-d')
+            : null;
     }
 }

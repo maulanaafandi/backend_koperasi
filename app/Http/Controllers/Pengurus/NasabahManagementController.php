@@ -48,7 +48,7 @@ public function show($id)
             'foto_profil' => $nasabah->foto_profil,
             'nomor_induk_kependudukan' => $nasabah->nomor_induk_kependudukan,
             'nama_ibu_kandung' => $nasabah->nama_ibu_kandung,
-            'tanggal_lahir' => $nasabah->tanggal_lahir,
+            'tanggal_lahir' => $nasabah->tanggal_lahir_format,
             'tempat_lahir' => $nasabah->tempat_lahir,
             'status_perkawinan' => $nasabah->status_perkawinan,
             'jenis_kelamin' => $nasabah->jenis_kelamin,

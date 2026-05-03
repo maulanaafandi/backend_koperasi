@@ -51,6 +51,7 @@ public function show($id)
 
     return response()->json([
         'data' => [
+            'id' => $pinjaman->id,
             'nama_lengkap' => optional($pinjaman->nasabah)->nama_lengkap,
             'nomor_rekening' => optional($pinjaman->nasabah)->nomor_rekening,
             'lama_angsuran'  => optional($pinjaman->tenor)->lama_angsuran_label,

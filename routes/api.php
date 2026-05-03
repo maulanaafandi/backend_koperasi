@@ -106,7 +106,7 @@ Route::middleware(['auth:sanctum', 'is_pengurus'])->group(function () {
     Route::get('/pengurus/transaksi-bayar-pinjaman', [TransaksiBayarPinjamanController::class, 'getBayarPinjaman']);
     Route::get('/pengurus/detail-transaksi-bayar-pinjaman/{id}', [TransaksiBayarPinjamanController::class, 'detailBayarPinjaman']);
     Route::post('/pengurus/kode-bayar-pinjam', [TransaksiBayarPinjamanController::class, 'detailBayarCicilan']);
-    Route::patch('/pengurus/update-status-pinjaman', [TransaksiBayarPinjamanController::class, 'statuslunasPinjaman']);
+    Route::patch('/pengurus/update-status-pinjaman/{kode_cicilan_pinjaman}', [TransaksiBayarPinjamanController::class, 'statuslunasPinjaman']);
 
     Route::get('/pengurus/pengumuman', [PengumumanController::class, 'index']);
     Route::get('/pengurus/get-pengumuman/{id}', [PengumumanController::class, 'show']);

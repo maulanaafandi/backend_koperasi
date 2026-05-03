@@ -47,7 +47,7 @@ public function detailBayarCicilan(Request $request)
             'message' => 'Pinjaman belum disetujui'
         ], 422);
     }
-    
+
     $nasabah = $pinjaman->nasabah;
 
     $bungaPersen = $pinjaman->tenor->bunga ?? 0;
@@ -141,40 +141,42 @@ public function detailBayarCicilan(Request $request)
         ], 200);
     }
 
-public function statuslunasPinjaman(Request $request)
-{
-    $request->validate([
-        'kode_cicilan_pinjaman' => 'required|exists:cicilan_pinjaman,kode_cicilan_pinjaman'
-    ]);
+    public function statuslunasPinjaman($kode_cicilan_pinjaman)
+    {
+        $cicilan = CicilanPinjaman::with('pinjaman')
+            ->where(
+                'kode_cicilan_pinjaman',
+                $kode_cicilan_pinjaman
+            )
+            ->first();
 
-    $cicilan = CicilanPinjaman::with('pinjaman')
-        ->where(
-            'kode_cicilan_pinjaman',
-            $request->kode_cicilan_pinjaman
-        )
-        ->first();
+        if (!$cicilan) {
+            return response()->json([
+                'message' => 'Data cicilan tidak ditemukan'
+            ], 404);
+        }
 
-    if (!$cicilan) {
+        $pinjaman = $cicilan->pinjaman;
+
+        if (!$pinjaman) {
+            return response()->json([
+                'message' => 'Data pinjaman tidak ditemukan'
+            ], 404);
+        }
+
+        if ($pinjaman->status !== 'Disetujui') {
         return response()->json([
-            'message' => 'Data cicilan tidak ditemukan'
-        ], 404);
-    }
+            'message' => 'Pinjaman belum disetujui'
+        ], 422);
+        }
 
-    $pinjaman = $cicilan->pinjaman;
+        $cicilan->status_angsuran = 'lunas';
+        $cicilan->waktu_dibayar = now();
+        $cicilan->dibayar_oleh = auth()->user()?->nomor_pengurus ?? 'PGR000';
+        $cicilan->save();
 
-    if (!$pinjaman) {
         return response()->json([
-            'message' => 'Data pinjaman tidak ditemukan'
-        ], 404);
+            'message' => 'Status cicilan lunas'
+        ], 200);
     }
-
-    $cicilan->status_angsuran = 'lunas';
-    $cicilan->waktu_dibayar = now();
-    $cicilan->dibayar_oleh = auth()->user()?->nomor_pengurus ?? 'PGR000';
-    $cicilan->save();
-
-    return response()->json([
-        'message' => 'Status cicilan lunas'
-    ], 200);
-}
 }

@@ -7,6 +7,7 @@ use App\Models\Pinjaman;
 use App\Models\Transaksi;
 use App\Models\Nasabah;
 use App\Models\Tenor;
+use App\Models\CicilanPinjaman;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;

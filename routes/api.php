@@ -127,7 +127,7 @@ Route::middleware(['auth:sanctum', 'is_nasabah'])->group(function () {
     Route::get('/nasabah/detail-bayar-pinjaman/{id}', [BayarPinjamanController::class, 'getDetailPinjamanNasabah']);
 
     Route::get('/nasabah/inbox', [InboxController::class, 'getInbox']);
-    Route::get('/nasabah/inbox/{id}', [InboxController::class, 'getDetailInbox']);
+    Route::get('/nasabah/detail-inbox/{id}', [InboxController::class, 'getDetailInbox']);
 
     Route::get('/nasabah/jenis-simpanan', [JenisSimpananNasabahController::class, 'getJenisSimpanan']);
 

@@ -135,7 +135,7 @@ public function store(Request $request)
         'id_pinjaman' => $pinjaman->id,
         'kode_cicilan_pinjaman' => $kodeCicilan,
         'nomor_angsuran' => 1,
-        'tanggal_jatuh_tempo' => now()->addMonth(),
+        'tanggal_jatuh_tempo' => now()->addMonths($tenor->lama_angsuran),
         'total_tagihan' => $request->jumlah_pinjaman,
         'tagihan_pokok' => $request->jumlah_pinjaman,
         'bunga' => 0,

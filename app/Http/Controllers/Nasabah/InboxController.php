@@ -15,6 +15,7 @@ class InboxController extends Controller
         return response()->json([
             'data' => $data->map(function ($item) {
                 return [
+                    'id'        => $item->id,
                     'judul'     => $item->judul,
                     'foto'      => $item->foto,
                     'deskripsi' => $item->deskripsi,

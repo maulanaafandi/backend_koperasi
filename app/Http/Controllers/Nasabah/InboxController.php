@@ -18,7 +18,6 @@ class InboxController extends Controller
                     'id'        => $item->id,
                     'judul'     => $item->judul,
                     'foto'      => $item->foto,
-                    'deskripsi' => $item->deskripsi,
                 ];
             })
         ], 200);
